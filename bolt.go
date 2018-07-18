@@ -16,8 +16,12 @@ const (
 )
 
 //newBoltStore creates new entryStore with boltdb as a backend
-func newBoltStore(fileName string) (entryStore, error) {
-	db, err := bolt.Open(fileName, 0600, nil)
+func newBoltStore(cfg config) (entryStore, error) {
+	path, err := cfg.GetStorePath()
+	if err != nil {
+		return nil, err
+	}
+	db, err := bolt.Open(path, 0600, nil)
 	if err != nil {
 		return nil, err
 	}

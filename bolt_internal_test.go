@@ -89,15 +89,15 @@ func TestGetBucketFromTime(t *testing.T) {
 }
 
 func TestGetBucketFromEntry(t *testing.T) {
-	entry := Entry{
+	e := entry{
 		Timestamp: timeFromString(t, "2018-07-18T00:00:00Z"),
 		Content:   []byte("asdb"),
 	}
-	bucket, err := getBucketFromEntry(entry)
+	bucket, err := getBucketFromEntry(e)
 	require.NoError(t, err)
 	assert.Equal(t, "2018-07-18", bucket)
 
-	empty := Entry{}
+	empty := entry{}
 	_, err = getBucketFromEntry(empty)
 	require.Error(t, err)
 }

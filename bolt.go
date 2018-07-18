@@ -15,9 +15,8 @@ const (
 	timeFormat = time.RFC3339
 )
 
-//NewBoltStore creates new EntryStore with boltdb as a backend
-//TODO: don't export this, use NewStore()
-func NewBoltStore(fileName string) (EntryStore, error) {
+//newBoltStore creates new entryStore with boltdb as a backend
+func newBoltStore(fileName string) (entryStore, error) {
 	db, err := bolt.Open(fileName, 0600, nil)
 	if err != nil {
 		return nil, err
@@ -27,7 +26,7 @@ func NewBoltStore(fileName string) (EntryStore, error) {
 	}, nil
 }
 
-func (s *boltStore) Put(e Entry) error {
+func (s *boltStore) Put(e entry) error {
 	bucketName, err := getBucketFromEntry(e)
 	if err != nil {
 		return err
@@ -37,16 +36,16 @@ func (s *boltStore) Put(e Entry) error {
 		if err != nil {
 			return err
 		}
-		return b.Put([]byte(e.Timestamp.Format(timeFormat)), e.Message)
+		return b.Put([]byte(e.Timestamp.Format(timeFormat)), e.Content)
 	})
 }
 
-func (s *boltStore) GetRange(start, end time.Time) ([]Entry, error) {
+func (s *boltStore) GetRange(start, end time.Time) ([]entry, error) {
 	buckets, err := getBucketRange(start, end)
 	if err != nil {
 		return nil, err
 	}
-	result := make([]Entry, 0)
+	result := make([]entry, 0)
 	for _, bucket := range buckets {
 		err := s.db.View(func(tx *bolt.Tx) error {
 			b := tx.Bucket([]byte(bucket))
@@ -58,9 +57,9 @@ func (s *boltStore) GetRange(start, end time.Time) ([]Entry, error) {
 				if err != nil {
 					return err
 				}
-				result = append(result, Entry{
+				result = append(result, entry{
 					Timestamp: timestamp,
-					Message:   v,
+					Content:   v,
 				})
 				return nil
 			})
@@ -72,7 +71,7 @@ func (s *boltStore) GetRange(start, end time.Time) ([]Entry, error) {
 	return result, nil
 }
 
-func (s *boltStore) GetRangeWithAggregation(start, end time.Time, agg AggregationFunction) (interface{}, error) {
+func (s *boltStore) GetRangeWithAggregation(start, end time.Time, agg aggregationFunction) (interface{}, error) {
 	if agg == nil {
 		return nil, errors.New("aggregation function is nil")
 	}
@@ -83,7 +82,7 @@ func (s *boltStore) GetRangeWithAggregation(start, end time.Time, agg Aggregatio
 	return agg(entries)
 }
 
-func getBucketFromEntry(e Entry) (string, error) {
+func getBucketFromEntry(e entry) (string, error) {
 	return getBucketFromTime(e.Timestamp)
 }
 

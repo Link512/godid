@@ -48,7 +48,7 @@ func (s *boltTestSuite) TestPut() {
 			entries: []Entry{
 				Entry{
 					Timestamp: timeFromString(s.T(), "2018-07-17T12:21:00Z"),
-					Message:   []byte("BOOYAA"),
+					Content:   []byte("BOOYAA"),
 				},
 			},
 			expectedBuckets: []string{"2018-07-17"},
@@ -60,11 +60,11 @@ func (s *boltTestSuite) TestPut() {
 			entries: []Entry{
 				Entry{
 					Timestamp: timeFromString(s.T(), "2018-07-17T12:21:00Z"),
-					Message:   []byte("BOOYAA"),
+					Content:   []byte("BOOYAA"),
 				},
 				Entry{
 					Timestamp: timeFromString(s.T(), "2018-07-18T12:21:00Z"),
-					Message:   []byte("BOOYAAKAA"),
+					Content:   []byte("BOOYAAKAA"),
 				},
 			},
 			expectedBuckets: []string{"2018-07-17", "2018-07-18"},
@@ -77,15 +77,15 @@ func (s *boltTestSuite) TestPut() {
 			entries: []Entry{
 				Entry{
 					Timestamp: timeFromString(s.T(), "2018-07-17T12:21:00Z"),
-					Message:   []byte("BOOYAA"),
+					Content:   []byte("BOOYAA"),
 				},
 				Entry{
 					Timestamp: timeFromString(s.T(), "2018-07-18T12:21:00Z"),
-					Message:   []byte("BOOYAAKAA"),
+					Content:   []byte("BOOYAAKAA"),
 				},
 				Entry{
 					Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"),
-					Message:   []byte("FOOBAR"),
+					Content:   []byte("FOOBAR"),
 				},
 			},
 			expectedBuckets: []string{"2018-07-17", "2018-07-18"},
@@ -118,12 +118,12 @@ func (s *boltTestSuite) TestPut() {
 
 func (s *boltTestSuite) TestGetRange() {
 	entries := []Entry{
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Message: []byte("msg1")},
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Message: []byte("msg2")},
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Message: []byte("msg3")},
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Message: []byte("msg4")},
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Message: []byte("msg5")},
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Message: []byte("msg6")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Content: []byte("msg1")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Content: []byte("msg2")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Content: []byte("msg3")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Content: []byte("msg4")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Content: []byte("msg5")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Content: []byte("msg6")},
 	}
 	for _, entry := range entries {
 		err := s.store.Put(entry)
@@ -151,29 +151,29 @@ func (s *boltTestSuite) TestGetRange() {
 		{
 			start:    timeFromString(s.T(), "2018-07-20T09:11:00Z"),
 			end:      timeFromString(s.T(), "2018-07-20T10:11:00Z"),
-			expected: []Entry{Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Message: []byte("msg6")}},
+			expected: []Entry{Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Content: []byte("msg6")}},
 		},
 		{
 			start: timeFromString(s.T(), "2018-07-18T12:11:00Z"),
 			end:   timeFromString(s.T(), "2018-07-19T09:11:00Z"),
 			expected: []Entry{
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Message: []byte("msg1")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Message: []byte("msg2")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Message: []byte("msg3")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Message: []byte("msg4")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Message: []byte("msg5")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Content: []byte("msg1")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Content: []byte("msg2")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Content: []byte("msg3")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Content: []byte("msg4")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Content: []byte("msg5")},
 			},
 		},
 		{
 			start: timeFromString(s.T(), "2018-06-18T12:11:00Z"),
 			end:   timeFromString(s.T(), "2018-09-19T09:11:00Z"),
 			expected: []Entry{
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Message: []byte("msg1")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Message: []byte("msg2")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Message: []byte("msg3")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Message: []byte("msg4")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Message: []byte("msg5")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Message: []byte("msg6")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Content: []byte("msg1")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Content: []byte("msg2")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Content: []byte("msg3")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Content: []byte("msg4")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Content: []byte("msg5")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Content: []byte("msg6")},
 			},
 		},
 	}
@@ -191,12 +191,12 @@ func (s *boltTestSuite) TestGetRange() {
 
 func (s *boltTestSuite) TestGetRangeWithAggregation() {
 	entries := []Entry{
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Message: []byte("msg1")},
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Message: []byte("msg2")},
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Message: []byte("msg3")},
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Message: []byte("msg4")},
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Message: []byte("msg5")},
-		Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Message: []byte("msg6")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Content: []byte("msg1")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Content: []byte("msg2")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Content: []byte("msg3")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Content: []byte("msg4")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Content: []byte("msg5")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Content: []byte("msg6")},
 	}
 	for _, entry := range entries {
 		err := s.store.Put(entry)
@@ -237,12 +237,12 @@ func (s *boltTestSuite) TestGetRangeWithAggregation() {
 				return e, nil
 			},
 			expected: []Entry{
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Message: []byte("msg1")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Message: []byte("msg2")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Message: []byte("msg3")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Message: []byte("msg4")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Message: []byte("msg5")},
-				Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Message: []byte("msg6")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Content: []byte("msg1")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Content: []byte("msg2")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Content: []byte("msg3")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Content: []byte("msg4")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Content: []byte("msg5")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Content: []byte("msg6")},
 			},
 		},
 	}

@@ -91,7 +91,7 @@ func TestGetBucketFromTime(t *testing.T) {
 func TestGetBucketFromEntry(t *testing.T) {
 	entry := Entry{
 		Timestamp: timeFromString(t, "2018-07-18T00:00:00Z"),
-		Message:   []byte("asdb"),
+		Content:   []byte("asdb"),
 	}
 	bucket, err := getBucketFromEntry(entry)
 	require.NoError(t, err)

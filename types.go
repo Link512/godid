@@ -2,18 +2,18 @@ package godid
 
 import "time"
 
-//Entry represents one entry in the db
-type Entry struct {
+//entry represents one entry in the db
+type entry struct {
 	Timestamp time.Time
-	Message   []byte
+	Content   []byte
 }
 
-//AggregationFunction is a function used to aggregate entries retrieved from the store
-type AggregationFunction func([]Entry) (interface{}, error)
+//aggregationFunction is a function used to aggregate entries retrieved from the store
+type aggregationFunction func([]entry) (interface{}, error)
 
-//EntryStore is the db manager for entries
-type EntryStore interface {
-	Put(Entry) error
-	GetRange(start, end time.Time) ([]Entry, error)
-	GetRangeWithAggregation(start, end time.Time, agg AggregationFunction) (interface{}, error)
+//entryStore is the db manager for entries
+type entryStore interface {
+	Put(entry) error
+	GetRange(start, end time.Time) ([]entry, error)
+	GetRangeWithAggregation(start, end time.Time, agg aggregationFunction) (interface{}, error)
 }

@@ -23,6 +23,10 @@ func TestGetBucketRange(t *testing.T) {
 		shouldError bool
 	}{
 		{
+			name:        "empty",
+			shouldError: true,
+		},
+		{
 			name:        "bad interval",
 			start:       time.Now().Add(1 * time.Hour),
 			end:         time.Now(),

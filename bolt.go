@@ -16,6 +16,7 @@ const (
 )
 
 //NewBoltStore creates new EntryStore with boltdb as a backend
+//TODO: don't export this, use NewStore()
 func NewBoltStore(fileName string) (EntryStore, error) {
 	db, err := bolt.Open(fileName, 0600, nil)
 	if err != nil {
@@ -72,6 +73,9 @@ func (s *boltStore) GetRange(start, end time.Time) ([]Entry, error) {
 }
 
 func (s *boltStore) GetRangeWithAggregation(start, end time.Time, agg AggregationFunction) (interface{}, error) {
+	if agg == nil {
+		return nil, errors.New("aggregation function is nil")
+	}
 	entries, err := s.GetRange(start, end)
 	if err != nil {
 		return nil, err
@@ -91,9 +95,13 @@ func getBucketFromTime(t time.Time) (string, error) {
 }
 
 func getBucketRange(start, end time.Time) ([]string, error) {
+	if start.IsZero() || end.IsZero() {
+		return nil, errors.New("start and end must be set")
+	}
 	if start.After(end) {
 		return nil, errors.New("start time is after end time")
 	}
+
 	strippedStart := start.Truncate(24 * time.Hour)
 	strippedEnd := end.AddDate(0, 0, 1).Truncate(24 * time.Hour)
 	buckets := make([]string, 0)

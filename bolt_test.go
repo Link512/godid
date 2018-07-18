@@ -1,8 +1,10 @@
 package godid
 
 import (
+	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/boltdb/bolt"
 
@@ -111,6 +113,150 @@ func (s *boltTestSuite) TestPut() {
 			}
 			return nil
 		})
+	}
+}
+
+func (s *boltTestSuite) TestGetRange() {
+	entries := []Entry{
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Message: []byte("msg1")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Message: []byte("msg2")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Message: []byte("msg3")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Message: []byte("msg4")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Message: []byte("msg5")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Message: []byte("msg6")},
+	}
+	for _, entry := range entries {
+		err := s.store.Put(entry)
+		s.NoError(err)
+	}
+	testCases := []struct {
+		start       time.Time
+		end         time.Time
+		shouldError bool
+		expected    []Entry
+	}{
+		{
+			shouldError: true,
+		},
+		{
+			start:       time.Now().Add(1 * time.Hour),
+			end:         time.Now(),
+			shouldError: true,
+		},
+		{
+			start:    timeFromString(s.T(), "2018-06-20T10:11:00Z"),
+			end:      timeFromString(s.T(), "2018-06-21T10:11:00Z"),
+			expected: []Entry{},
+		},
+		{
+			start:    timeFromString(s.T(), "2018-07-20T09:11:00Z"),
+			end:      timeFromString(s.T(), "2018-07-20T10:11:00Z"),
+			expected: []Entry{Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Message: []byte("msg6")}},
+		},
+		{
+			start: timeFromString(s.T(), "2018-07-18T12:11:00Z"),
+			end:   timeFromString(s.T(), "2018-07-19T09:11:00Z"),
+			expected: []Entry{
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Message: []byte("msg1")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Message: []byte("msg2")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Message: []byte("msg3")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Message: []byte("msg4")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Message: []byte("msg5")},
+			},
+		},
+		{
+			start: timeFromString(s.T(), "2018-06-18T12:11:00Z"),
+			end:   timeFromString(s.T(), "2018-09-19T09:11:00Z"),
+			expected: []Entry{
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Message: []byte("msg1")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Message: []byte("msg2")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Message: []byte("msg3")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Message: []byte("msg4")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Message: []byte("msg5")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Message: []byte("msg6")},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		entries, err := s.store.GetRange(tc.start, tc.end)
+		if tc.shouldError {
+			s.Error(err)
+		} else {
+			s.NoError(err)
+			s.Equal(tc.expected, entries)
+		}
+	}
+}
+
+func (s *boltTestSuite) TestGetRangeWithAggregation() {
+	entries := []Entry{
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Message: []byte("msg1")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Message: []byte("msg2")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Message: []byte("msg3")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Message: []byte("msg4")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Message: []byte("msg5")},
+		Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Message: []byte("msg6")},
+	}
+	for _, entry := range entries {
+		err := s.store.Put(entry)
+		s.NoError(err)
+	}
+	testCases := []struct {
+		start       time.Time
+		end         time.Time
+		agg         AggregationFunction
+		shouldError bool
+		expected    interface{}
+	}{
+		{
+			shouldError: true,
+		},
+		{
+			start:       time.Now().Add(1 * time.Hour),
+			end:         time.Now(),
+			shouldError: true,
+		},
+		{
+			start:       timeFromString(s.T(), "2018-06-20T10:11:00Z"),
+			end:         timeFromString(s.T(), "2018-06-21T10:11:00Z"),
+			shouldError: true,
+		},
+		{
+			start: timeFromString(s.T(), "2018-06-20T10:11:00Z"),
+			end:   timeFromString(s.T(), "2018-06-21T10:11:00Z"),
+			agg: func(e []Entry) (interface{}, error) {
+				return nil, errors.New("BOOM")
+			},
+			shouldError: true,
+		},
+		{
+			start: timeFromString(s.T(), "2018-06-18T12:11:00Z"),
+			end:   timeFromString(s.T(), "2018-09-19T09:11:00Z"),
+			agg: func(e []Entry) (interface{}, error) {
+				return e, nil
+			},
+			expected: []Entry{
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T12:11:00Z"), Message: []byte("msg1")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T13:32:00Z"), Message: []byte("msg2")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-18T14:21:00Z"), Message: []byte("msg3")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T09:11:00Z"), Message: []byte("msg4")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-19T23:15:00Z"), Message: []byte("msg5")},
+				Entry{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Message: []byte("msg6")},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		result, err := s.store.GetRangeWithAggregation(tc.start, tc.end, tc.agg)
+		if tc.shouldError {
+			s.Error(err)
+		} else {
+			s.NoError(err)
+			entries, ok := result.([]Entry)
+			s.True(ok)
+			s.Equal(tc.expected, entries)
+		}
 	}
 }
 

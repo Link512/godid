@@ -65,9 +65,26 @@ func GetToday() ([]string, error) {
 	return result["flat"], nil
 }
 
+//GetYesterday retrieves all entries logged yesterday
+func GetYesterday() ([]string, error) {
+	start := time.Now().AddDate(0, 0, -1)
+	result, err := getRange(start, start, true)
+	if err != nil {
+		return nil, err
+	}
+	return result["flat"], nil
+}
+
+//GetThisWeek returns all entries from the current week
+func GetThisWeek(flat bool) (map[string][]string, error) {
+	start, end := getWeekInterval(time.Now())
+	return getRange(start, end, flat)
+}
+
 //GetLastWeek returns all entries from the previous week
 func GetLastWeek(flat bool) (map[string][]string, error) {
-	start, end := getPreviousWeekInterval(time.Now())
+	aWeekBefore := time.Now().AddDate(0, 0, -7)
+	start, end := getWeekInterval(aWeekBefore)
 	return getRange(start, end, flat)
 }
 
@@ -81,15 +98,13 @@ func GetLastDuration(durationString string, flat bool) (map[string][]string, err
 	return getRange(now.Add(-1*d), now, flat)
 }
 
-func getPreviousWeekInterval(reference time.Time) (time.Time, time.Time) {
-	sub := -7
+func getWeekInterval(reference time.Time) (time.Time, time.Time) {
+	weekDay := int(reference.Weekday())
 	if reference.Weekday() == time.Sunday {
-		sub--
+		weekDay = int(time.Saturday) + 1
 	}
-	aWeekBefore := reference.AddDate(0, 0, sub)
-	start := aWeekBefore.AddDate(0, 0, -1*(int(aWeekBefore.Weekday())-int(time.Monday)))
-	end := aWeekBefore.AddDate(0, 0, int(time.Saturday)+1-int(aWeekBefore.Weekday()))
-
+	start := reference.AddDate(0, 0, -1*(weekDay-int(time.Monday)))
+	end := reference.AddDate(0, 0, int(time.Saturday)+1-weekDay)
 	return start, end
 }
 

@@ -22,12 +22,7 @@ func (s *boltTestSuite) SetupSuite() {
 }
 
 func (s *boltTestSuite) SetupTest() {
-	testConfig := config{
-		StorePath: "test.db",
-	}
-	store, err := newBoltStore(testConfig)
-	s.NoError(err)
-	s.store = store.(*boltStore)
+	s.store = getTestBoltStore(s.T())
 	s.db = s.store.db
 }
 

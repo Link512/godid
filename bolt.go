@@ -16,7 +16,7 @@ const (
 )
 
 //newBoltStore creates new entryStore with boltdb as a backend
-func newBoltStore(cfg config) (entryStore, error) {
+func newBoltStore(cfg config) (*boltStore, error) {
 	path, err := cfg.GetStorePath()
 	if err != nil {
 		return nil, err

@@ -24,6 +24,9 @@
 #   go-tests = true
 #   unused-packages = true
 
+required = [
+  "github.com/matryer/moq"
+]
 
 [[constraint]]
   name = "github.com/boltdb/bolt"
@@ -32,3 +35,11 @@
 [[constraint]]
   name = "github.com/stretchr/testify"
   version = "v1.2.2"
+
+[[constraint]]
+  name = "github.com/mitchellh/go-homedir"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/go-yaml/yaml"
+  version = "v2.2.1"

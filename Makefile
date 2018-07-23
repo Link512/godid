@@ -5,4 +5,4 @@ mock_entry_store.go:
 	moq -out=mock_entry_store.go . entryStore
 
 test: mocks
-	go test . -race -p=1
+	GODID_TEST=1 go test . -race -p=1

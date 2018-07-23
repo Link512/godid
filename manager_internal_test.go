@@ -106,3 +106,133 @@ func TestGetRange(t *testing.T) {
 		})
 	}
 }
+
+func TestFlatAggregation(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []entry
+		expected []string
+	}{
+		{
+			name:     "empty",
+			expected: []string{},
+		},
+		{
+			name: "entries in one day",
+			input: []entry{
+				entry{
+					Timestamp: timeFromString(t, "2018-07-18T12:00:00Z"),
+					Content:   []byte("msg1"),
+				},
+				entry{
+					Timestamp: timeFromString(t, "2018-07-18T14:00:00Z"),
+					Content:   []byte("msg2"),
+				},
+			},
+			expected: []string{"msg1", "msg2"},
+		},
+		{
+			name: "entries in separate days",
+			input: []entry{
+				entry{
+					Timestamp: timeFromString(t, "2018-07-18T12:00:00Z"),
+					Content:   []byte("msg1"),
+				},
+				entry{
+					Timestamp: timeFromString(t, "2018-07-18T14:00:00Z"),
+					Content:   []byte("msg2"),
+				},
+				entry{
+					Timestamp: timeFromString(t, "2018-07-20T14:00:00Z"),
+					Content:   []byte("msg3"),
+				},
+			},
+			expected: []string{"msg1", "msg2", "msg3"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := flatAggregation(tc.input)
+			require.NoError(t, err)
+			actual, ok := result.([]string)
+			require.True(t, ok)
+			require.Equal(t, tc.expected, actual)
+
+		})
+	}
+}
+
+func TestPerDayAggregation(t *testing.T) {
+	testCases := []struct {
+		name        string
+		input       []entry
+		shouldError bool
+		expected    map[string][]string
+	}{
+		{
+			name:     "empty",
+			expected: map[string][]string{},
+		},
+		{
+			name: "bad entry",
+			input: []entry{
+				entry{
+					Content: []byte("bad"),
+				},
+			},
+			shouldError: true,
+		},
+		{
+			name: "entries in one day",
+			input: []entry{
+				entry{
+					Timestamp: timeFromString(t, "2018-07-18T12:00:00Z"),
+					Content:   []byte("msg1"),
+				},
+				entry{
+					Timestamp: timeFromString(t, "2018-07-18T14:00:00Z"),
+					Content:   []byte("msg2"),
+				},
+			},
+			expected: map[string][]string{
+				"2018-07-18": []string{"msg1", "msg2"},
+			},
+		},
+		{
+			name: "entries in separate days",
+			input: []entry{
+				entry{
+					Timestamp: timeFromString(t, "2018-07-18T12:00:00Z"),
+					Content:   []byte("msg1"),
+				},
+				entry{
+					Timestamp: timeFromString(t, "2018-07-18T14:00:00Z"),
+					Content:   []byte("msg2"),
+				},
+				entry{
+					Timestamp: timeFromString(t, "2018-07-20T14:00:00Z"),
+					Content:   []byte("msg3"),
+				},
+			},
+			expected: map[string][]string{
+				"2018-07-18": []string{"msg1", "msg2"},
+				"2018-07-20": []string{"msg3"},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := perDayAggregation(tc.input)
+			if tc.shouldError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				actual, ok := result.(map[string][]string)
+				require.True(t, ok)
+				require.Equal(t, tc.expected, actual)
+			}
+		})
+	}
+}

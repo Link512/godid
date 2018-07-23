@@ -56,9 +56,8 @@ func AddEntry(what string) error {
 
 //GetToday retrieves all entries logged today
 func GetToday() ([]string, error) {
-	end := time.Now()
-	start := end.Add(-1 * time.Hour)
-	result, err := getRange(start, end, true)
+	start := time.Now()
+	result, err := getRange(start, start, true)
 	if err != nil {
 		return nil, err
 	}

@@ -108,12 +108,15 @@ func getBucketRange(start, end time.Time) ([]string, error) {
 	strippedStart := start.Truncate(24 * time.Hour)
 	strippedEnd := end.AddDate(0, 0, 1).Truncate(24 * time.Hour)
 	buckets := make([]string, 0)
-	for i := strippedStart.UnixNano(); i < strippedEnd.UnixNano(); i += int64(24 * time.Hour) {
-		bucket, err := getBucketFromTime(time.Unix(0, i))
+
+	for i := strippedStart; i.Before(strippedEnd); {
+		bucket, err := getBucketFromTime(i)
 		if err != nil {
 			return nil, err
 		}
+		i = i.AddDate(0, 0, 1)
 		buckets = append(buckets, bucket)
 	}
+
 	return buckets, nil
 }

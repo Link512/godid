@@ -2,6 +2,9 @@ package godid
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -89,12 +92,25 @@ func GetLastWeek(flat bool) (map[string][]string, error) {
 
 //GetLastDuration retrives all the entries from the custom previous duration
 func GetLastDuration(durationString string, flat bool) (map[string][]string, error) {
-	d, err := time.ParseDuration(durationString)
+
+	d, err := parseDuration(durationString)
 	if err != nil {
 		return nil, err
 	}
 	now := time.Now()
 	return getRange(now.Add(-1*d), now, flat)
+}
+
+func parseDuration(durationString string) (time.Duration, error) {
+	if strings.HasSuffix(durationString, "d") {
+		amountString := durationString[:len(durationString)-1]
+		amount, err := strconv.Atoi(amountString)
+		if err != nil {
+			return 0, fmt.Errorf("unknown unit ah in duration %s", durationString)
+		}
+		return time.Duration(amount) * 24 * time.Hour, nil
+	}
+	return time.ParseDuration(durationString)
 }
 
 func getWeekInterval(reference time.Time) (time.Time, time.Time) {

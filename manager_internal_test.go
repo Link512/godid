@@ -10,6 +10,43 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestParseDuration(t *testing.T) {
+	testCases := []struct {
+		name           string
+		durationString string
+		shouldError    bool
+		expected       time.Duration
+	}{
+		{
+			name:           "different interval",
+			durationString: "12ah",
+			shouldError:    true,
+		},
+		{
+			name:           "bad interval",
+			durationString: "12ad",
+			shouldError:    true,
+		},
+		{
+			name:           "good interval",
+			durationString: "12d",
+			expected:       12 * 24 * time.Hour,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual, err := parseDuration(tc.durationString)
+			if tc.shouldError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expected, actual)
+			}
+		})
+	}
+}
+
 func TestGetWeekInterval(t *testing.T) {
 	expectedStart := timeFromString(t, "2018-07-09T12:21:00Z")
 	expectedEnd := timeFromString(t, "2018-07-15T12:21:00Z")

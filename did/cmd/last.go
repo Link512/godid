@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
-	"strings"
 
 	"github.com/Link512/godid"
 	"github.com/spf13/cobra"
@@ -28,9 +26,7 @@ var lastCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		for k, v := range last {
-			fmt.Printf("Done on: %s\n%s\n", k, strings.Join(v, "\n"))
-		}
+		printResults(last)
 		return nil
 	},
 }

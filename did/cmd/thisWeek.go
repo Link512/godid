@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/Link512/godid"
 
 	"github.com/spf13/cobra"
@@ -21,9 +18,7 @@ var thisWeekCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		for k, v := range thisWeek {
-			fmt.Printf("Done on: %s\n%s\n", k, strings.Join(v, "\n"))
-		}
+		printResults(thisWeek)
 		return nil
 	},
 }

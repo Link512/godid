@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/Link512/godid"
 
 	"github.com/spf13/cobra"
@@ -17,7 +14,7 @@ var todayCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(strings.Join(today, "\n"))
+		printResults(map[string][]string{"Today": today})
 		return nil
 	},
 }

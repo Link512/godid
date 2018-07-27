@@ -46,5 +46,10 @@ required = [
   branch = "master"
 
 [[constraint]]
+  name = "github.com/olekukonko/tablewriter"
+  branch = "master"
+
+
+[[constraint]]
   name = "github.com/go-yaml/yaml"
   version = "v2.2.1"

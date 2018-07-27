@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"time"
+
 	"github.com/Link512/godid"
 	"github.com/spf13/cobra"
 )
@@ -14,7 +16,11 @@ var yesterdayCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		printResults(map[string][]string{"Yesterday": yesterday})
+		if len(yesterday) != 0 {
+			printResults(map[string][]string{time.Now().AddDate(0, 0, -1).Format("2006-01-02"): yesterday})
+		} else {
+			printEmpty()
+		}
 		return nil
 	},
 }

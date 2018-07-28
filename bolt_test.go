@@ -27,6 +27,7 @@ func (s *boltTestSuite) SetupTest() {
 }
 
 func (s *boltTestSuite) TearDownTest() {
+	s.store.Close()
 	s.store = nil
 	os.Remove("test.db")
 }

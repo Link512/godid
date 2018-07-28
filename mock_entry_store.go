@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	lockentryStoreMockClose                   sync.RWMutex
 	lockentryStoreMockGetRange                sync.RWMutex
 	lockentryStoreMockGetRangeWithAggregation sync.RWMutex
 	lockentryStoreMockPut                     sync.RWMutex
@@ -20,6 +21,9 @@ var (
 //
 //         // make and configure a mocked entryStore
 //         mockedentryStore := &entryStoreMock{
+//             CloseFunc: func() error {
+// 	               panic("TODO: mock out the Close method")
+//             },
 //             GetRangeFunc: func(start time.Time, end time.Time) ([]entry, error) {
 // 	               panic("TODO: mock out the GetRange method")
 //             },
@@ -36,6 +40,9 @@ var (
 //
 //     }
 type entryStoreMock struct {
+	// CloseFunc mocks the Close method.
+	CloseFunc func() error
+
 	// GetRangeFunc mocks the GetRange method.
 	GetRangeFunc func(start time.Time, end time.Time) ([]entry, error)
 
@@ -47,6 +54,9 @@ type entryStoreMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
+		// Close holds details about calls to the Close method.
+		Close []struct {
+		}
 		// GetRange holds details about calls to the GetRange method.
 		GetRange []struct {
 			// Start is the start argument value.
@@ -69,6 +79,32 @@ type entryStoreMock struct {
 			In1 entry
 		}
 	}
+}
+
+// Close calls CloseFunc.
+func (mock *entryStoreMock) Close() error {
+	if mock.CloseFunc == nil {
+		panic("entryStoreMock.CloseFunc: method is nil but entryStore.Close was just called")
+	}
+	callInfo := struct {
+	}{}
+	lockentryStoreMockClose.Lock()
+	mock.calls.Close = append(mock.calls.Close, callInfo)
+	lockentryStoreMockClose.Unlock()
+	return mock.CloseFunc()
+}
+
+// CloseCalls gets all the calls that were made to Close.
+// Check the length with:
+//     len(mockedentryStore.CloseCalls())
+func (mock *entryStoreMock) CloseCalls() []struct {
+} {
+	var calls []struct {
+	}
+	lockentryStoreMockClose.RLock()
+	calls = mock.calls.Close
+	lockentryStoreMockClose.RUnlock()
+	return calls
 }
 
 // GetRange calls GetRangeFunc.

@@ -50,6 +50,7 @@ func init() {
 
 //AddEntry adds an entry to the underlying store
 func AddEntry(what string) error {
+	defer store.Close()
 	e := entry{
 		Content:   []byte(what),
 		Timestamp: time.Now(),
@@ -124,6 +125,7 @@ func getWeekInterval(reference time.Time) (time.Time, time.Time) {
 }
 
 func getRange(start, end time.Time, flat bool) (map[string][]string, error) {
+	defer store.Close()
 	var agg aggregationFunction
 	if flat {
 		agg = flatAggregation

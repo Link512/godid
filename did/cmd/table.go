@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"sort"
+	"strings"
 
 	"github.com/olekukonko/tablewriter"
 )
@@ -21,10 +23,15 @@ func printResults(result map[string][]string) {
 	writer.SetAutoWrapText(true)
 	writer.SetRowLine(true)
 	writer.SetHeader([]string{"Date", "Entries"})
+	bulkEntries := make([][]string, 0)
 	for date, entries := range result {
 		for _, entry := range entries {
-			writer.Append([]string{date, entry})
+			bulkEntries = append(bulkEntries, []string{date, entry})
 		}
 	}
+	sort.Slice(bulkEntries, func(i, j int) bool {
+		return strings.Compare(bulkEntries[i][0], bulkEntries[j][0]) > 0
+	})
+	writer.AppendBulk(bulkEntries)
 	writer.Render()
 }

@@ -15,7 +15,7 @@ all: $(INSTALLED)
 mocks:\
 	mock_entry_store.go
 
-mock_entry_store.go:
+mock_entry_store.go: types.go
 	moq -out=mock_entry_store.go . entryStore
 
 test: mocks

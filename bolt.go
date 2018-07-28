@@ -21,7 +21,7 @@ func newBoltStore(cfg config) (*boltStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	db, err := bolt.Open(path, 0600, nil)
+	db, err := bolt.Open(path, 0600, &bolt.Options{Timeout: 10 * time.Second})
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +84,10 @@ func (s *boltStore) GetRangeWithAggregation(start, end time.Time, agg aggregatio
 		return nil, err
 	}
 	return agg(entries)
+}
+
+func (s *boltStore) Close() error {
+	return s.db.Close()
 }
 
 func getBucketFromEntry(e entry) (string, error) {

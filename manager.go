@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+const (
+	flatEntriesPlaceholder = "all entries"
+)
+
 var (
 	store           entryStore
 	flatAggregation = func(entries []entry) (interface{}, error) {
@@ -37,7 +41,8 @@ var (
 	}
 )
 
-func init() {
+//Init initialises godid
+func Init() {
 	cfg, err := getConfig()
 	if err != nil {
 		panic(err)
@@ -48,9 +53,13 @@ func init() {
 	}
 }
 
+// Close closes godid
+func Close() {
+	store.Close()
+}
+
 //AddEntry adds an entry to the underlying store
 func AddEntry(what string) error {
-	defer store.Close()
 	e := entry{
 		Content:   []byte(what),
 		Timestamp: time.Now(),
@@ -65,7 +74,7 @@ func GetToday() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return result["flat"], nil
+	return result[flatEntriesPlaceholder], nil
 }
 
 //GetYesterday retrieves all entries logged yesterday
@@ -75,7 +84,7 @@ func GetYesterday() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return result["flat"], nil
+	return result[flatEntriesPlaceholder], nil
 }
 
 //GetThisWeek returns all entries from the current week
@@ -125,7 +134,6 @@ func getWeekInterval(reference time.Time) (time.Time, time.Time) {
 }
 
 func getRange(start, end time.Time, flat bool) (map[string][]string, error) {
-	defer store.Close()
 	var agg aggregationFunction
 	if flat {
 		agg = flatAggregation
@@ -145,7 +153,7 @@ func getRange(start, end time.Time, flat bool) (map[string][]string, error) {
 		if !ok {
 			return nil, errors.New("internal error, cannot convert result")
 		}
-		result["flat"] = flatEntries
+		result[flatEntriesPlaceholder] = flatEntries
 	} else {
 		var ok bool
 		result, ok = entries.(map[string][]string)

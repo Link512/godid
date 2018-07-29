@@ -13,6 +13,8 @@ var lastWeekCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		godid.Init()
+		defer godid.Close()
 		lastWeek, err := godid.GetLastWeek(flat)
 		if err != nil {
 			return err

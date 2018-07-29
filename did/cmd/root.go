@@ -23,6 +23,8 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		godid.Init()
+		defer godid.Close()
 		if entry != "" {
 			return godid.AddEntry(entry)
 		}

@@ -98,7 +98,7 @@ func TestGetRange(t *testing.T) {
 			end:         time.Now().AddDate(0, 0, 1),
 			flat:        true,
 			storeReturn: []string{"a", "b", "c"},
-			expected:    map[string][]string{"flat": []string{"a", "b", "c"}},
+			expected:    map[string][]string{flatEntriesPlaceholder: []string{"a", "b", "c"}},
 		},
 		{
 			name:  "per day",

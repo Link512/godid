@@ -14,6 +14,8 @@ var thisWeekCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		godid.Init()
+		defer godid.Close()
 		thisWeek, err := godid.GetThisWeek(flat)
 		if err != nil {
 			return err

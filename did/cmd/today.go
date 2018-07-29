@@ -12,6 +12,8 @@ var todayCmd = &cobra.Command{
 	Use:   "today",
 	Short: "Displays the tasks logged today",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		godid.Init()
+		defer godid.Close()
 		today, err := godid.GetToday()
 		if err != nil {
 			return err

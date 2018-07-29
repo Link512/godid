@@ -12,6 +12,8 @@ var yesterdayCmd = &cobra.Command{
 	Short: "Displays the tasks logged yesterday",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		godid.Init()
+		defer godid.Close()
 		yesterday, err := godid.GetYesterday()
 		if err != nil {
 			return err

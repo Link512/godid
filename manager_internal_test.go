@@ -98,19 +98,19 @@ func TestGetRange(t *testing.T) {
 			end:         time.Now().AddDate(0, 0, 1),
 			flat:        true,
 			storeReturn: []string{"a", "b", "c"},
-			expected:    map[string][]string{flatEntriesPlaceholder: []string{"a", "b", "c"}},
+			expected:    map[string][]string{flatEntriesPlaceholder: {"a", "b", "c"}},
 		},
 		{
 			name:  "per day",
 			start: time.Now(),
 			end:   time.Now().AddDate(0, 0, 1),
 			storeReturn: map[string][]string{
-				"key1": []string{"a", "b", "c"},
-				"key2": []string{"foo"},
+				"key1": {"a", "b", "c"},
+				"key2": {"foo"},
 			},
 			expected: map[string][]string{
-				"key1": []string{"a", "b", "c"},
-				"key2": []string{"foo"},
+				"key1": {"a", "b", "c"},
+				"key2": {"foo"},
 			},
 		},
 	}
@@ -157,11 +157,11 @@ func TestFlatAggregation(t *testing.T) {
 		{
 			name: "entries in one day",
 			input: []entry{
-				entry{
+				{
 					Timestamp: timeFromString(t, "2018-07-18T12:00:00Z"),
 					Content:   []byte("msg1"),
 				},
-				entry{
+				{
 					Timestamp: timeFromString(t, "2018-07-18T14:00:00Z"),
 					Content:   []byte("msg2"),
 				},
@@ -171,15 +171,15 @@ func TestFlatAggregation(t *testing.T) {
 		{
 			name: "entries in separate days",
 			input: []entry{
-				entry{
+				{
 					Timestamp: timeFromString(t, "2018-07-18T12:00:00Z"),
 					Content:   []byte("msg1"),
 				},
-				entry{
+				{
 					Timestamp: timeFromString(t, "2018-07-18T14:00:00Z"),
 					Content:   []byte("msg2"),
 				},
-				entry{
+				{
 					Timestamp: timeFromString(t, "2018-07-20T14:00:00Z"),
 					Content:   []byte("msg3"),
 				},
@@ -214,7 +214,7 @@ func TestPerDayAggregation(t *testing.T) {
 		{
 			name: "bad entry",
 			input: []entry{
-				entry{
+				{
 					Content: []byte("bad"),
 				},
 			},
@@ -223,38 +223,38 @@ func TestPerDayAggregation(t *testing.T) {
 		{
 			name: "entries in one day",
 			input: []entry{
-				entry{
+				{
 					Timestamp: timeFromString(t, "2018-07-18T12:00:00Z"),
 					Content:   []byte("msg1"),
 				},
-				entry{
+				{
 					Timestamp: timeFromString(t, "2018-07-18T14:00:00Z"),
 					Content:   []byte("msg2"),
 				},
 			},
 			expected: map[string][]string{
-				"2018-07-18": []string{"msg1", "msg2"},
+				"2018-07-18": {"msg1", "msg2"},
 			},
 		},
 		{
 			name: "entries in separate days",
 			input: []entry{
-				entry{
+				{
 					Timestamp: timeFromString(t, "2018-07-18T12:00:00Z"),
 					Content:   []byte("msg1"),
 				},
-				entry{
+				{
 					Timestamp: timeFromString(t, "2018-07-18T14:00:00Z"),
 					Content:   []byte("msg2"),
 				},
-				entry{
+				{
 					Timestamp: timeFromString(t, "2018-07-20T14:00:00Z"),
 					Content:   []byte("msg3"),
 				},
 			},
 			expected: map[string][]string{
-				"2018-07-18": []string{"msg1", "msg2"},
-				"2018-07-20": []string{"msg3"},
+				"2018-07-18": {"msg1", "msg2"},
+				"2018-07-20": {"msg3"},
 			},
 		},
 	}

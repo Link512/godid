@@ -27,7 +27,7 @@ test: mocks
 	GODID_TEST=1 go test . -race -p=1
 
 cover: mocks
-	GODID_TEST=1 go test -race -coverprofile=coverage.txt -covermode=count -p=1 .
+	GODID_TEST=1 go test -race -coverprofile=coverage.txt -covermode=atomic -p=1 .
 
 publish:
 	@if [ "$(V)" = "" ]; then echo "You shouldn't be calling this directly, use publish-[major|minor|bug]"; exit 1; fi

@@ -13,7 +13,7 @@ install:
   - make all
 
 script:
-  - if [ -z "$TRAVIS_TAG" ]; then travis_wait make cover; else make test; fi
+  - travis_wait make cover
 
 after_success:
    - bash <(curl -s https://codecov.io/bash) -t 009c6129-4454-4732-9004-d3f6376d89c5

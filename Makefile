@@ -26,6 +26,9 @@ mock_entry_store.go: types.go
 test: mocks
 	GODID_TEST=1 go test . -race -p=1
 
+cover: mocks
+	GODID_TEST=1 go test -race -coverprofile=coverage.txt -covermode=count -p=1 .
+
 publish:
 	@if [ "$(V)" = "" ]; then echo "You shouldn't be calling this directly, use publish-[major|minor|bug]"; exit 1; fi
 	git tag -a -m "Bump version" v$(V)

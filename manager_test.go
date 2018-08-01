@@ -70,10 +70,11 @@ func TestGetToday(t *testing.T) {
 			assert.Equal(t, curD, eD)
 
 			assert.Equal(t, reflect.ValueOf(flatAggregation).Pointer(), reflect.ValueOf(f).Pointer())
-			return nil, nil
+			return []string{}, nil
 		},
 	}
-	GetToday()
+	_, err := GetToday()
+	require.NoError(t, err)
 }
 
 func TestGetYesterday(t *testing.T) {
@@ -92,10 +93,11 @@ func TestGetYesterday(t *testing.T) {
 			assert.Equal(t, curD, eD)
 
 			assert.Equal(t, reflect.ValueOf(flatAggregation).Pointer(), reflect.ValueOf(f).Pointer())
-			return nil, nil
+			return []string{}, nil
 		},
 	}
-	GetYesterday()
+	_, err := GetYesterday()
+	require.NoError(t, err)
 }
 
 func TestGetThisWeek(t *testing.T) {

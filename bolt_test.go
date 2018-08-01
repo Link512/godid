@@ -215,6 +215,14 @@ func (s *boltTestSuite) TestGetRangeWithAggregation() {
 			start:       time.Now().Add(1 * time.Hour),
 			end:         time.Now(),
 			shouldError: true,
+			agg: func(e []entry) (interface{}, error) {
+				return nil, nil
+			},
+		},
+		{
+			start:       time.Now().Add(1 * time.Hour),
+			end:         time.Now(),
+			shouldError: true,
 		},
 		{
 			start:       timeFromString(s.T(), "2018-06-20T10:11:00Z"),

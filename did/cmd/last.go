@@ -9,7 +9,7 @@ import (
 
 var lastCmd = &cobra.Command{
 	Use:   "last",
-	Short: "Display the entries logged in the last custom day duration",
+	Short: "Display the tasks logged in the last custom day duration",
 	Long:  `The duration string only accepts days: 1d, 2d, etc`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {

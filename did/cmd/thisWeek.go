@@ -8,7 +8,7 @@ import (
 
 var thisWeekCmd = &cobra.Command{
 	Use:   "thisWeek",
-	Short: "Display the tasks logged this week",
+	Short: "Displays the tasks logged this week",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		flat, err := cmd.Flags().GetBool("flat")
 		if err != nil {

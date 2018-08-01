@@ -22,6 +22,7 @@ func printResults(result map[string][]string) {
 	writer.SetAutoMergeCells(true)
 	writer.SetAutoWrapText(true)
 	writer.SetRowLine(true)
+	writer.SetColWidth(4096)
 	writer.SetHeader([]string{"Date", "Entries"})
 	bulkEntries := make([][]string, 0)
 	for date, entries := range result {

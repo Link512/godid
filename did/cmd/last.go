@@ -9,8 +9,8 @@ import (
 
 var lastCmd = &cobra.Command{
 	Use:   "last",
-	Short: "Display the entries logged in the last custom duration",
-	Long:  `The duration string must be parsable by go's time.ParseDuration`,
+	Short: "Display the entries logged in the last custom day duration",
+	Long:  `The duration string only accepts days: 1d, 2d, etc`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return errors.New("must specify interval")

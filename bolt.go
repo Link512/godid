@@ -109,8 +109,12 @@ func getBucketRange(start, end time.Time) ([]string, error) {
 		return nil, errors.New("start time is after end time")
 	}
 
-	strippedStart := start.Truncate(24 * time.Hour)
-	strippedEnd := end.AddDate(0, 0, 1).Truncate(24 * time.Hour)
+	truncate := func(t time.Time) time.Time {
+		return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+	}
+
+	strippedStart := truncate(start)
+	strippedEnd := truncate(end.AddDate(0, 0, 1))
 	buckets := make([]string, 0)
 
 	for i := strippedStart; i.Before(strippedEnd); {

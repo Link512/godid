@@ -49,7 +49,7 @@ func getConfig() (*config, error) {
 }
 
 func initDefaultConfig() (*config, error) {
-	if os.Getenv("GODID_TEST") != "" {
+	if os.Getenv("GODID_TEST") == "" {
 		cfgPath, err := homedir.Expand(configPath)
 		if err != nil {
 			return nil, err

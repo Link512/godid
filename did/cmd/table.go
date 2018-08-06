@@ -31,7 +31,7 @@ func printResults(result map[string][]string) {
 		}
 	}
 	sort.Slice(bulkEntries, func(i, j int) bool {
-		return strings.Compare(bulkEntries[i][0], bulkEntries[j][0]) > 0
+		return strings.Compare(bulkEntries[i][0], bulkEntries[j][0]) < 0
 	})
 	writer.AppendBulk(bulkEntries)
 	writer.Render()

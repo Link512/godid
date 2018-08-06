@@ -28,6 +28,7 @@ test: mocks
 
 cover: mocks
 	GODID_TEST=1 go test -race -coverprofile=coverage.txt -covermode=atomic -p=1 .
+	@sed -i -e '/.*mock_entry_store\.go.*/d' ./coverage.txt
 
 publish:
 	@if [ "$(V)" = "" ]; then echo "You shouldn't be calling this directly, use publish-[major|minor|bug]"; exit 1; fi

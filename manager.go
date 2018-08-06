@@ -47,6 +47,9 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
+	if cfg == nil {
+		panic(errors.New("null config"))
+	}
 	store, err = newBoltStore(*cfg)
 	if err != nil {
 		panic(err)

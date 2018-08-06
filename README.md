@@ -1,7 +1,7 @@
 
 # go-did [![Build](https://travis-ci.org/Link512/godid.svg?&branch=master)](https://travis-ci.org/Link512/godid) [![Go Report Card](https://goreportcard.com/badge/github.com/Link512/godid)](https://goreportcard.com/report/github.com/Link512/godid) [![codecov](https://codecov.io/gh/Link512/godid/branch/master/graph/badge.svg)](https://codecov.io/gh/Link512/godid)
 
-Simple task tracker written in `go`
+Simple task tracker written in `go`. Use it to quickly write down tasks that you've completed and then access summaries for daily/weekly standup purposes.
 
 ## Install
 
@@ -52,7 +52,6 @@ Run `did` with no arguments and write each entry on a new line. Press `Ctrl-d` t
 ### Getting last week's summary, flat
 
 ![Screen5](https://i.imgur.com/E1qpXSS.png)
-
 
 ### Getting a custom interval summary
 

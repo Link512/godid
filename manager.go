@@ -3,13 +3,17 @@ package godid
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
-	"strings"
 	"time"
 )
 
 const (
 	flatEntriesPlaceholder = "all entries"
+)
+
+var (
+	lastDurationPattern = regexp.MustCompile(`^(\d+)d$`)
 )
 
 var (
@@ -115,15 +119,15 @@ func GetLastDuration(durationString string, flat bool) (map[string][]string, err
 }
 
 func parseDuration(durationString string) (time.Duration, error) {
-	if strings.HasSuffix(durationString, "d") {
-		amountString := durationString[:len(durationString)-1]
-		amount, err := strconv.Atoi(amountString)
-		if err != nil {
-			return 0, fmt.Errorf("unknown unit ah in duration %s", durationString)
-		}
-		return time.Duration(amount) * 24 * time.Hour, nil
+	match := lastDurationPattern.FindStringSubmatch(durationString)
+	if match == nil {
+		return 0, fmt.Errorf("invalid duration string %s", durationString)
 	}
-	return time.ParseDuration(durationString)
+	d, err := strconv.Atoi(match[1])
+	if err != nil {
+		return 0, err
+	}
+	return 24 * time.Duration(d) * time.Hour, nil
 }
 
 func getWeekInterval(reference time.Time) (time.Time, time.Time) {

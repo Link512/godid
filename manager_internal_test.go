@@ -19,7 +19,7 @@ func TestParseDuration(t *testing.T) {
 	}{
 		{
 			name:           "different interval",
-			durationString: "12ah",
+			durationString: "12h",
 			shouldError:    true,
 		},
 		{

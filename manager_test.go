@@ -191,17 +191,17 @@ func TestGetLastDuration(t *testing.T) {
 	}{
 		{
 			name:        "bad interval",
-			interval:    "bad",
+			interval:    "1080h",
 			shouldError: true,
 		},
 		{
 			name:     "flat",
-			interval: "1080h",
+			interval: "45d",
 			flat:     true,
 		},
 		{
 			name:     "aggregated",
-			interval: "1080h",
+			interval: "45d",
 		},
 	}
 
@@ -210,7 +210,7 @@ func TestGetLastDuration(t *testing.T) {
 			store = &entryStoreMock{
 				GetRangeWithAggregationFunc: func(start, end time.Time, f aggregationFunction) (interface{}, error) {
 					if !tc.shouldError {
-						d, err := time.ParseDuration(tc.interval)
+						d, err := parseDuration(tc.interval)
 						require.NoError(t, err)
 						expectedStart := time.Now().Add(-1 * d)
 						expectedEnd := time.Now()

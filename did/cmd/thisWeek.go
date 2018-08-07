@@ -17,11 +17,7 @@ var thisWeekCmd = &cobra.Command{
 		godid.Init()
 		defer godid.Close()
 		thisWeek, err := godid.GetThisWeek(flat)
-		if err != nil {
-			return err
-		}
-		printResults(thisWeek)
-		return nil
+		return handleResult(thisWeek, err)
 	},
 }
 

@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	configPath = "~/.godid/config.yml"
+	workDir    = "~/.godid/"
+	configPath = workDir + "config.yml"
 )
 
 type config struct {
@@ -23,7 +24,7 @@ func (c *config) GetStorePath() (string, error) {
 
 var (
 	defaultConfig = config{
-		StorePath: "~/.godid/store.db",
+		StorePath: workDir + "store.db",
 	}
 )
 

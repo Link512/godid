@@ -2,7 +2,6 @@ package godid
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
 	"time"
@@ -121,7 +120,7 @@ func GetLastDuration(durationString string, flat bool) (map[string][]string, err
 func parseDuration(durationString string) (time.Duration, error) {
 	match := lastDurationPattern.FindStringSubmatch(durationString)
 	if match == nil {
-		return 0, fmt.Errorf("invalid duration string %s", durationString)
+		return 0, didErrorf("invalid duration string %s", durationString)
 	}
 	d, err := strconv.Atoi(match[1])
 	if err != nil {

@@ -25,11 +25,7 @@ var lastCmd = &cobra.Command{
 		godid.Init()
 		defer godid.Close()
 		last, err := godid.GetLastDuration(args[0], flat)
-		if err != nil {
-			return err
-		}
-		printResults(last)
-		return nil
+		return handleResult(last, err)
 	},
 }
 

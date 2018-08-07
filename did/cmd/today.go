@@ -15,15 +15,7 @@ var todayCmd = &cobra.Command{
 		godid.Init()
 		defer godid.Close()
 		today, err := godid.GetToday()
-		if err != nil {
-			return err
-		}
-		if len(today) != 0 {
-			printResults(map[string][]string{time.Now().Format("2006-01-02"): today})
-		} else {
-			printEmpty()
-		}
-		return nil
+		return handleResult(map[string][]string{time.Now().Format("2006-01-02"): today}, err)
 	},
 }
 

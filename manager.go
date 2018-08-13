@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"strconv"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -70,7 +72,15 @@ func AddEntry(what string) error {
 		Content:   []byte(what),
 		Timestamp: time.Now(),
 	}
-	return store.Put(e)
+	err := store.Put(e)
+	if err != nil {
+		getLogger().WithFields(logrus.Fields{
+			"component": "manager",
+			"method":    "AddEntry",
+			"entry":     "what",
+		}).WithError(err).Error("failed to put entry")
+	}
+	return err
 }
 
 //GetToday retrieves all entries logged today
@@ -78,6 +88,11 @@ func GetToday() ([]string, error) {
 	start := time.Now()
 	result, err := getRange(start, start, true)
 	if err != nil {
+		getLogger().WithFields(logrus.Fields{
+			"component": "manager",
+			"method":    "GetToday",
+			"timestamp": start,
+		}).WithError(err).Error("failed to get entries")
 		return nil, err
 	}
 	return result[flatEntriesPlaceholder], nil
@@ -88,6 +103,11 @@ func GetYesterday() ([]string, error) {
 	start := time.Now().AddDate(0, 0, -1)
 	result, err := getRange(start, start, true)
 	if err != nil {
+		getLogger().WithFields(logrus.Fields{
+			"component": "manager",
+			"method":    "GetYesterday",
+			"timestamp": start,
+		}).WithError(err).Error("failed to get entries")
 		return nil, err
 	}
 	return result[flatEntriesPlaceholder], nil
@@ -96,14 +116,34 @@ func GetYesterday() ([]string, error) {
 //GetThisWeek returns all entries from the current week
 func GetThisWeek(flat bool) (map[string][]string, error) {
 	start, end := getWeekInterval(time.Now())
-	return getRange(start, end, flat)
+	result, err := getRange(start, end, flat)
+	if err != nil {
+		getLogger().WithFields(logrus.Fields{
+			"component": "manager",
+			"method":    "GetThisWeek",
+			"start":     start,
+			"end":       end,
+			"flat":      flat,
+		}).WithError(err).Error("failed to get entries")
+	}
+	return result, err
 }
 
 //GetLastWeek returns all entries from the previous week
 func GetLastWeek(flat bool) (map[string][]string, error) {
 	aWeekBefore := time.Now().AddDate(0, 0, -7)
 	start, end := getWeekInterval(aWeekBefore)
-	return getRange(start, end, flat)
+	result, err := getRange(start, end, flat)
+	if err != nil {
+		getLogger().WithFields(logrus.Fields{
+			"component": "manager",
+			"method":    "GetThisWeek",
+			"start":     start,
+			"end":       end,
+			"flat":      flat,
+		}).WithError(err).Error("failed to get entries")
+	}
+	return result, err
 }
 
 //GetLastDuration retrives all the entries from the custom previous duration
@@ -114,7 +154,17 @@ func GetLastDuration(durationString string, flat bool) (map[string][]string, err
 		return nil, err
 	}
 	now := time.Now()
-	return getRange(now.Add(-1*d), now, flat)
+	result, err := getRange(now.Add(-1*d), now, flat)
+	if err != nil {
+		getLogger().WithFields(logrus.Fields{
+			"component": "manager",
+			"method":    "GetThisWeek",
+			"start":     now.Add(-1 * d),
+			"end":       now,
+			"flat":      flat,
+		}).WithError(err).Error("failed to get entries")
+	}
+	return result, err
 }
 
 func parseDuration(durationString string) (time.Duration, error) {

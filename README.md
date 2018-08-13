@@ -18,7 +18,7 @@ Usage:
 
 Available Commands:
   help        Help about any command
-  last        Display the tasks logged in the last custom day duration
+  last        Displays the tasks logged in the last custom day duration
   lastWeek    Displays the tasks logged last week
   thisWeek    Displays the tasks logged this week
   today       Displays the tasks logged today

@@ -17,7 +17,7 @@ type aggregationFunction func([]entry) (interface{}, error)
 //entryStore is the db manager for entries
 type entryStore interface {
 	io.Closer
-	Put(entry) error
-	GetRange(start, end time.Time) ([]entry, error)
-	GetRangeWithAggregation(start, end time.Time, agg aggregationFunction) (interface{}, error)
+	Put(string, entry) error
+	GetRange(parentBucketName string, start, end time.Time) ([]entry, error)
+	GetRangeWithAggregation(parentBucketName string, start, end time.Time, agg aggregationFunction) (interface{}, error)
 }

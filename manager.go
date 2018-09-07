@@ -11,6 +11,7 @@ import (
 
 const (
 	flatEntriesPlaceholder = "all entries"
+	rootBucketName         = "root"
 )
 
 var (
@@ -72,7 +73,7 @@ func AddEntry(what string) error {
 		Content:   []byte(what),
 		Timestamp: time.Now(),
 	}
-	err := store.Put(e)
+	err := store.Put(rootBucketName, e)
 	if err != nil {
 		getLogger().WithFields(logrus.Fields{
 			"component": "manager",
@@ -197,7 +198,7 @@ func getRange(start, end time.Time, flat bool) (map[string][]string, error) {
 		agg = perDayAggregation
 	}
 
-	entries, err := store.GetRangeWithAggregation(start, end, agg)
+	entries, err := store.GetRangeWithAggregation(rootBucketName, start, end, agg)
 	if err != nil {
 		return nil, err
 	}

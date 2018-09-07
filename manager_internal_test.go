@@ -118,7 +118,7 @@ func TestGetRange(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			store = &entryStoreMock{
-				GetRangeWithAggregationFunc: func(_, _ time.Time, f aggregationFunction) (interface{}, error) {
+				GetRangeWithAggregationFunc: func(_ string, _, _ time.Time, f aggregationFunction) (interface{}, error) {
 					if tc.storeShouldError {
 						return nil, errors.New("boom")
 					}

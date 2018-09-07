@@ -30,13 +30,17 @@ func newBoltStore(cfg config) (*boltStore, error) {
 	}, nil
 }
 
-func (s *boltStore) Put(e entry) error {
+func (s *boltStore) Put(parentBucketName string, e entry) error {
 	bucketName, err := getBucketFromEntry(e)
 	if err != nil {
 		return err
 	}
 	return s.db.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		parentBucket, err := tx.CreateBucketIfNotExists([]byte(parentBucketName))
+		if err != nil {
+			return err
+		}
+		b, err := parentBucket.CreateBucketIfNotExists([]byte(bucketName))
 		if err != nil {
 			return err
 		}
@@ -44,7 +48,7 @@ func (s *boltStore) Put(e entry) error {
 	})
 }
 
-func (s *boltStore) GetRange(start, end time.Time) ([]entry, error) {
+func (s *boltStore) GetRange(parentBucketName string, start, end time.Time) ([]entry, error) {
 	buckets, err := getBucketRange(start, end)
 	if err != nil {
 		return nil, err
@@ -52,7 +56,11 @@ func (s *boltStore) GetRange(start, end time.Time) ([]entry, error) {
 	result := make([]entry, 0)
 	for _, bucket := range buckets {
 		err := s.db.View(func(tx *bolt.Tx) error {
-			b := tx.Bucket([]byte(bucket))
+			parentBucket := tx.Bucket([]byte(parentBucketName))
+			if parentBucket == nil {
+				return nil
+			}
+			b := parentBucket.Bucket([]byte(bucket))
 			if b == nil {
 				return nil
 			}
@@ -75,11 +83,11 @@ func (s *boltStore) GetRange(start, end time.Time) ([]entry, error) {
 	return result, nil
 }
 
-func (s *boltStore) GetRangeWithAggregation(start, end time.Time, agg aggregationFunction) (interface{}, error) {
+func (s *boltStore) GetRangeWithAggregation(parentBucketName string, start, end time.Time, agg aggregationFunction) (interface{}, error) {
 	if agg == nil {
 		return nil, errors.New("aggregation function is nil")
 	}
-	entries, err := s.GetRange(start, end)
+	entries, err := s.GetRange(parentBucketName, start, end)
 	if err != nil {
 		return nil, err
 	}

@@ -24,13 +24,13 @@ var (
 //             CloseFunc: func() error {
 // 	               panic("TODO: mock out the Close method")
 //             },
-//             GetRangeFunc: func(start time.Time, end time.Time) ([]entry, error) {
+//             GetRangeFunc: func(parentBucketName string, start time.Time, end time.Time) ([]entry, error) {
 // 	               panic("TODO: mock out the GetRange method")
 //             },
-//             GetRangeWithAggregationFunc: func(start time.Time, end time.Time, agg aggregationFunction) (interface{}, error) {
+//             GetRangeWithAggregationFunc: func(parentBucketName string, start time.Time, end time.Time, agg aggregationFunction) (interface{}, error) {
 // 	               panic("TODO: mock out the GetRangeWithAggregation method")
 //             },
-//             PutFunc: func(in1 entry) error {
+//             PutFunc: func(in1 string, in2 entry) error {
 // 	               panic("TODO: mock out the Put method")
 //             },
 //         }
@@ -44,13 +44,13 @@ type entryStoreMock struct {
 	CloseFunc func() error
 
 	// GetRangeFunc mocks the GetRange method.
-	GetRangeFunc func(start time.Time, end time.Time) ([]entry, error)
+	GetRangeFunc func(parentBucketName string, start time.Time, end time.Time) ([]entry, error)
 
 	// GetRangeWithAggregationFunc mocks the GetRangeWithAggregation method.
-	GetRangeWithAggregationFunc func(start time.Time, end time.Time, agg aggregationFunction) (interface{}, error)
+	GetRangeWithAggregationFunc func(parentBucketName string, start time.Time, end time.Time, agg aggregationFunction) (interface{}, error)
 
 	// PutFunc mocks the Put method.
-	PutFunc func(in1 entry) error
+	PutFunc func(in1 string, in2 entry) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -59,6 +59,8 @@ type entryStoreMock struct {
 		}
 		// GetRange holds details about calls to the GetRange method.
 		GetRange []struct {
+			// ParentBucketName is the parentBucketName argument value.
+			ParentBucketName string
 			// Start is the start argument value.
 			Start time.Time
 			// End is the end argument value.
@@ -66,6 +68,8 @@ type entryStoreMock struct {
 		}
 		// GetRangeWithAggregation holds details about calls to the GetRangeWithAggregation method.
 		GetRangeWithAggregation []struct {
+			// ParentBucketName is the parentBucketName argument value.
+			ParentBucketName string
 			// Start is the start argument value.
 			Start time.Time
 			// End is the end argument value.
@@ -76,7 +80,9 @@ type entryStoreMock struct {
 		// Put holds details about calls to the Put method.
 		Put []struct {
 			// In1 is the in1 argument value.
-			In1 entry
+			In1 string
+			// In2 is the in2 argument value.
+			In2 entry
 		}
 	}
 }
@@ -108,33 +114,37 @@ func (mock *entryStoreMock) CloseCalls() []struct {
 }
 
 // GetRange calls GetRangeFunc.
-func (mock *entryStoreMock) GetRange(start time.Time, end time.Time) ([]entry, error) {
+func (mock *entryStoreMock) GetRange(parentBucketName string, start time.Time, end time.Time) ([]entry, error) {
 	if mock.GetRangeFunc == nil {
 		panic("entryStoreMock.GetRangeFunc: method is nil but entryStore.GetRange was just called")
 	}
 	callInfo := struct {
-		Start time.Time
-		End   time.Time
+		ParentBucketName string
+		Start            time.Time
+		End              time.Time
 	}{
-		Start: start,
-		End:   end,
+		ParentBucketName: parentBucketName,
+		Start:            start,
+		End:              end,
 	}
 	lockentryStoreMockGetRange.Lock()
 	mock.calls.GetRange = append(mock.calls.GetRange, callInfo)
 	lockentryStoreMockGetRange.Unlock()
-	return mock.GetRangeFunc(start, end)
+	return mock.GetRangeFunc(parentBucketName, start, end)
 }
 
 // GetRangeCalls gets all the calls that were made to GetRange.
 // Check the length with:
 //     len(mockedentryStore.GetRangeCalls())
 func (mock *entryStoreMock) GetRangeCalls() []struct {
-	Start time.Time
-	End   time.Time
+	ParentBucketName string
+	Start            time.Time
+	End              time.Time
 } {
 	var calls []struct {
-		Start time.Time
-		End   time.Time
+		ParentBucketName string
+		Start            time.Time
+		End              time.Time
 	}
 	lockentryStoreMockGetRange.RLock()
 	calls = mock.calls.GetRange
@@ -143,37 +153,41 @@ func (mock *entryStoreMock) GetRangeCalls() []struct {
 }
 
 // GetRangeWithAggregation calls GetRangeWithAggregationFunc.
-func (mock *entryStoreMock) GetRangeWithAggregation(start time.Time, end time.Time, agg aggregationFunction) (interface{}, error) {
+func (mock *entryStoreMock) GetRangeWithAggregation(parentBucketName string, start time.Time, end time.Time, agg aggregationFunction) (interface{}, error) {
 	if mock.GetRangeWithAggregationFunc == nil {
 		panic("entryStoreMock.GetRangeWithAggregationFunc: method is nil but entryStore.GetRangeWithAggregation was just called")
 	}
 	callInfo := struct {
-		Start time.Time
-		End   time.Time
-		Agg   aggregationFunction
+		ParentBucketName string
+		Start            time.Time
+		End              time.Time
+		Agg              aggregationFunction
 	}{
-		Start: start,
-		End:   end,
-		Agg:   agg,
+		ParentBucketName: parentBucketName,
+		Start:            start,
+		End:              end,
+		Agg:              agg,
 	}
 	lockentryStoreMockGetRangeWithAggregation.Lock()
 	mock.calls.GetRangeWithAggregation = append(mock.calls.GetRangeWithAggregation, callInfo)
 	lockentryStoreMockGetRangeWithAggregation.Unlock()
-	return mock.GetRangeWithAggregationFunc(start, end, agg)
+	return mock.GetRangeWithAggregationFunc(parentBucketName, start, end, agg)
 }
 
 // GetRangeWithAggregationCalls gets all the calls that were made to GetRangeWithAggregation.
 // Check the length with:
 //     len(mockedentryStore.GetRangeWithAggregationCalls())
 func (mock *entryStoreMock) GetRangeWithAggregationCalls() []struct {
-	Start time.Time
-	End   time.Time
-	Agg   aggregationFunction
+	ParentBucketName string
+	Start            time.Time
+	End              time.Time
+	Agg              aggregationFunction
 } {
 	var calls []struct {
-		Start time.Time
-		End   time.Time
-		Agg   aggregationFunction
+		ParentBucketName string
+		Start            time.Time
+		End              time.Time
+		Agg              aggregationFunction
 	}
 	lockentryStoreMockGetRangeWithAggregation.RLock()
 	calls = mock.calls.GetRangeWithAggregation
@@ -182,29 +196,33 @@ func (mock *entryStoreMock) GetRangeWithAggregationCalls() []struct {
 }
 
 // Put calls PutFunc.
-func (mock *entryStoreMock) Put(in1 entry) error {
+func (mock *entryStoreMock) Put(in1 string, in2 entry) error {
 	if mock.PutFunc == nil {
 		panic("entryStoreMock.PutFunc: method is nil but entryStore.Put was just called")
 	}
 	callInfo := struct {
-		In1 entry
+		In1 string
+		In2 entry
 	}{
 		In1: in1,
+		In2: in2,
 	}
 	lockentryStoreMockPut.Lock()
 	mock.calls.Put = append(mock.calls.Put, callInfo)
 	lockentryStoreMockPut.Unlock()
-	return mock.PutFunc(in1)
+	return mock.PutFunc(in1, in2)
 }
 
 // PutCalls gets all the calls that were made to Put.
 // Check the length with:
 //     len(mockedentryStore.PutCalls())
 func (mock *entryStoreMock) PutCalls() []struct {
-	In1 entry
+	In1 string
+	In2 entry
 } {
 	var calls []struct {
-		In1 entry
+		In1 string
+		In2 entry
 	}
 	lockentryStoreMockPut.RLock()
 	calls = mock.calls.Put

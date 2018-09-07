@@ -34,7 +34,8 @@ func TestAddEntry(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			var insertedEntry entry
 			store = &entryStoreMock{
-				PutFunc: func(e entry) error {
+				PutFunc: func(bucketName string, e entry) error {
+					require.Equal(t, rootBucketName, bucketName)
 					if tc.shouldError {
 						return errors.New("BOOM")
 					}
@@ -56,7 +57,8 @@ func TestAddEntry(t *testing.T) {
 
 func TestGetToday(t *testing.T) {
 	store = &entryStoreMock{
-		GetRangeWithAggregationFunc: func(start, end time.Time, f aggregationFunction) (interface{}, error) {
+		GetRangeWithAggregationFunc: func(bucketName string, start, end time.Time, f aggregationFunction) (interface{}, error) {
+			require.Equal(t, rootBucketName, bucketName)
 			curY, curM, curD := time.Now().Date()
 
 			sY, sM, sD := start.Date()
@@ -79,7 +81,7 @@ func TestGetToday(t *testing.T) {
 
 func TestGetYesterday(t *testing.T) {
 	store = &entryStoreMock{
-		GetRangeWithAggregationFunc: func(start, end time.Time, f aggregationFunction) (interface{}, error) {
+		GetRangeWithAggregationFunc: func(_ string, start, end time.Time, f aggregationFunction) (interface{}, error) {
 			curY, curM, curD := time.Now().AddDate(0, 0, -1).Date()
 
 			sY, sM, sD := start.Date()
@@ -114,7 +116,8 @@ func TestGetThisWeek(t *testing.T) {
 
 	for _, tc := range testCases {
 		store = &entryStoreMock{
-			GetRangeWithAggregationFunc: func(start, end time.Time, f aggregationFunction) (interface{}, error) {
+			GetRangeWithAggregationFunc: func(bucketName string, start, end time.Time, f aggregationFunction) (interface{}, error) {
+				require.Equal(t, rootBucketName, bucketName)
 				expectedStart, expectedEnd := getWeekInterval(time.Now()) //kinda circlejerking, but hey
 
 				exY, exM, exD := expectedStart.Date()
@@ -155,7 +158,8 @@ func TestGetLastWeek(t *testing.T) {
 
 	for _, tc := range testCases {
 		store = &entryStoreMock{
-			GetRangeWithAggregationFunc: func(start, end time.Time, f aggregationFunction) (interface{}, error) {
+			GetRangeWithAggregationFunc: func(bucketName string, start, end time.Time, f aggregationFunction) (interface{}, error) {
+				require.Equal(t, rootBucketName, bucketName)
 				expectedStart, expectedEnd := getWeekInterval(time.Now().AddDate(0, 0, -7)) //kinda circlejerking, but hey
 
 				exY, exM, exD := expectedStart.Date()
@@ -208,7 +212,8 @@ func TestGetLastDuration(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			store = &entryStoreMock{
-				GetRangeWithAggregationFunc: func(start, end time.Time, f aggregationFunction) (interface{}, error) {
+				GetRangeWithAggregationFunc: func(bucketName string, start, end time.Time, f aggregationFunction) (interface{}, error) {
+					require.Equal(t, rootBucketName, bucketName)
 					if !tc.shouldError {
 						d, err := parseDuration(tc.interval)
 						require.NoError(t, err)

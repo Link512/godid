@@ -13,12 +13,14 @@ import (
 
 type boltTestSuite struct {
 	suite.Suite
-	store *boltStore
-	db    *bolt.DB
+	store          *boltStore
+	db             *bolt.DB
+	testBucketName string
 }
 
 func (s *boltTestSuite) SetupSuite() {
 	os.Remove("test.db")
+	s.testBucketName = "test-bucket"
 }
 
 func (s *boltTestSuite) SetupTest() {
@@ -40,7 +42,7 @@ func (s *boltTestSuite) TestPut() {
 		expectedBucketCounts map[string]int
 	}{
 		{
-			entries:     []entry{{}},
+			entries:     []entry{},
 			shouldError: true,
 		},
 		{
@@ -97,7 +99,7 @@ func (s *boltTestSuite) TestPut() {
 
 	for _, tc := range testCases {
 		for _, entry := range tc.entries {
-			err := s.store.Put(entry)
+			err := s.store.Put(s.testBucketName, entry)
 			if tc.shouldError {
 				s.Error(err)
 			} else {
@@ -106,7 +108,9 @@ func (s *boltTestSuite) TestPut() {
 		}
 		s.db.View(func(tx *bolt.Tx) error {
 			for _, b := range tc.expectedBuckets {
-				bucket := tx.Bucket([]byte(b))
+				parentBucket := tx.Bucket([]byte(s.testBucketName))
+				s.NotNil(parentBucket)
+				bucket := parentBucket.Bucket([]byte(b))
 				s.NotNil(bucket)
 				s.Equal(tc.expectedBucketCounts[b], bucket.Stats().KeyN)
 			}
@@ -125,7 +129,7 @@ func (s *boltTestSuite) TestGetRange() {
 		{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Content: []byte("msg6")},
 	}
 	for _, entry := range entries {
-		err := s.store.Put(entry)
+		err := s.store.Put(s.testBucketName, entry)
 		s.NoError(err)
 	}
 	testCases := []struct {
@@ -178,7 +182,7 @@ func (s *boltTestSuite) TestGetRange() {
 	}
 
 	for _, tc := range testCases {
-		entries, err := s.store.GetRange(tc.start, tc.end)
+		entries, err := s.store.GetRange(s.testBucketName, tc.start, tc.end)
 		if tc.shouldError {
 			s.Error(err)
 		} else {
@@ -198,7 +202,7 @@ func (s *boltTestSuite) TestGetRangeWithAggregation() {
 		{Timestamp: timeFromString(s.T(), "2018-07-20T10:11:00Z"), Content: []byte("msg6")},
 	}
 	for _, entry := range entries {
-		err := s.store.Put(entry)
+		err := s.store.Put(s.testBucketName, entry)
 		s.NoError(err)
 	}
 	testCases := []struct {
@@ -255,7 +259,7 @@ func (s *boltTestSuite) TestGetRangeWithAggregation() {
 	}
 
 	for _, tc := range testCases {
-		result, err := s.store.GetRangeWithAggregation(tc.start, tc.end, tc.agg)
+		result, err := s.store.GetRangeWithAggregation(s.testBucketName, tc.start, tc.end, tc.agg)
 		if tc.shouldError {
 			s.Error(err)
 		} else {

@@ -60,6 +60,7 @@ func TestGetWeekInterval(t *testing.T) {
 }
 
 func TestGetRange(t *testing.T) {
+	testBucketName := "test-bucket"
 	testCases := []struct {
 		name             string
 		start            time.Time
@@ -118,7 +119,8 @@ func TestGetRange(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			store = &entryStoreMock{
-				GetRangeWithAggregationFunc: func(_ string, _, _ time.Time, f aggregationFunction) (interface{}, error) {
+				GetRangeWithAggregationFunc: func(bucketName string, _, _ time.Time, f aggregationFunction) (interface{}, error) {
+					require.Equal(t, testBucketName, bucketName)
 					if tc.storeShouldError {
 						return nil, errors.New("boom")
 					}
@@ -133,7 +135,7 @@ func TestGetRange(t *testing.T) {
 					return tc.storeReturn, nil
 				},
 			}
-			result, err := getRange(tc.start, tc.end, tc.flat)
+			result, err := getRange(testBucketName, tc.start, tc.end, tc.flat)
 			if tc.shouldError {
 				require.Error(t, err)
 			} else {

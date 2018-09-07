@@ -20,12 +20,12 @@ type boltTestSuite struct {
 
 func (s *boltTestSuite) SetupSuite() {
 	os.Remove("test.db")
-	s.testBucketName = "test-bucket"
 }
 
 func (s *boltTestSuite) SetupTest() {
 	s.store = getTestBoltStore(s.T())
 	s.db = s.store.db
+	s.testBucketName = randString(10)
 }
 
 func (s *boltTestSuite) TearDownTest() {

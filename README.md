@@ -6,7 +6,7 @@ Simple task tracker written in `go`. Use it to quickly write down tasks that you
 ## Install
 
 ```bash
-go get -u github.com/Link512/godid/did
+go get -u gopkg.in/Link512/godid.v1/did
 ```
 
 ## Usage

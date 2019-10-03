@@ -15,6 +15,10 @@ var (
 	lockentryStoreMockPut                     sync.RWMutex
 )
 
+// Ensure, that entryStoreMock does implement entryStore.
+// If this is not the case, regenerate this file with moq.
+var _ entryStore = &entryStoreMock{}
+
 // entryStoreMock is a mock implementation of entryStore.
 //
 //     func TestSomethingThatUsesentryStore(t *testing.T) {
@@ -22,21 +26,21 @@ var (
 //         // make and configure a mocked entryStore
 //         mockedentryStore := &entryStoreMock{
 //             CloseFunc: func() error {
-// 	               panic("TODO: mock out the Close method")
+// 	               panic("mock out the Close method")
 //             },
 //             GetRangeFunc: func(parentBucketName string, start time.Time, end time.Time) ([]entry, error) {
-// 	               panic("TODO: mock out the GetRange method")
+// 	               panic("mock out the GetRange method")
 //             },
 //             GetRangeWithAggregationFunc: func(parentBucketName string, start time.Time, end time.Time, agg aggregationFunction) (interface{}, error) {
-// 	               panic("TODO: mock out the GetRangeWithAggregation method")
+// 	               panic("mock out the GetRangeWithAggregation method")
 //             },
 //             PutFunc: func(in1 string, in2 entry) error {
-// 	               panic("TODO: mock out the Put method")
+// 	               panic("mock out the Put method")
 //             },
 //         }
 //
-//         // TODO: use mockedentryStore in code that requires entryStore
-//         //       and then make assertions.
+//         // use mockedentryStore in code that requires entryStore
+//         // and then make assertions.
 //
 //     }
 type entryStoreMock struct {

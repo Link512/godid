@@ -1,0 +1,39 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: test
+    image: golang
+    commands:
+      - go get github.com/matryer/moq
+      - make cover
+
+  - name: codecov
+    image: plugins/codecov
+    settings:
+      token:
+        from_secret: codecov_slug
+
+  - name: build
+    image: golang
+    commands:
+      - mkdir build
+      - go build -o build/did ./did/
+
+  - name: lint
+    image: golangci/golangci-lint
+    commands:
+      - golangci-lint run
+
+  - name: publish
+    image: plugins/github-release
+    settings:
+      api_key:
+        from_secret: github_token
+      files:
+        - build/did
+      title: ${DRONE_TAG}
+    when:
+      event: tag

@@ -12,8 +12,6 @@ import (
 	"github.com/Link512/godid"
 )
 
-var cfgFile string
-
 var rootCmd = &cobra.Command{
 	Use:   "did",
 	Short: "A simple task tracker",

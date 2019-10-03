@@ -1,5 +1,4 @@
-
-# did [![Build](https://travis-ci.org/Link512/godid.svg?&branch=master)](https://travis-ci.org/Link512/godid) [![Go Report Card](https://goreportcard.com/badge/github.com/Link512/godid)](https://goreportcard.com/report/github.com/Link512/godid) [![codecov](https://codecov.io/gh/Link512/godid/branch/master/graph/badge.svg)](https://codecov.io/gh/Link512/godid)
+# did [![Build Status](https://cloud.drone.io/api/badges/Link512/godid/status.svg)](https://cloud.drone.io/Link512/godid) [![Go Report Card](https://goreportcard.com/badge/github.com/Link512/godid)](https://goreportcard.com/report/github.com/Link512/godid) [![codecov](https://codecov.io/gh/Link512/godid/branch/master/graph/badge.svg)](https://codecov.io/gh/Link512/godid)
 
 ![logo](https://i.imgur.com/FpcrltN.png)
 

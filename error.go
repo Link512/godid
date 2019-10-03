@@ -11,12 +11,6 @@ func (e DidError) Error() string {
 	return e.message
 }
 
-func didError(msg string) DidError {
-	return DidError{
-		message: msg,
-	}
-}
-
 func didErrorf(format string, args ...interface{}) DidError {
 	return DidError{
 		message: fmt.Sprintf(format, args...),

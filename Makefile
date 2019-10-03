@@ -5,15 +5,8 @@ CURRENT_MAJOR = $(shell echo $(VERSION) | cut -d '.' -f 1)
 CURRENT_MINOR = $(shell echo $(VERSION) | cut -d '.' -f 2)
 CURRENT_BUG = $(shell echo $(VERSION) | cut -d '.' -f 3)
 
-ifndef VIRTUALGO
-    $(error No virtualgo workspace is active)
-endif
-
 GOBIN ?= $(GOPATH)/bin
 INSTALLED = $(GOBIN)/did
-VG_DEPS = $(VIRTUALGO_PATH)/last-ensure
-GO_FILES = $(shell find . -name "*.go" | grep -v "_test.go$$" | xargs)
-DEPS = $(VG_DEPS) $(GO_FILES)
 
 all: $(INSTALLED)
 
@@ -51,7 +44,3 @@ publish-bug: update-master
 $(INSTALLED): $(DEPS)
 	go install ./did/
 	@touch $(INSTALLED)
-
-$(VG_DEPS): Gopkg.toml Gopkg.lock
-	vg ensure -- -v
-	@touch $(VG_DEPS)

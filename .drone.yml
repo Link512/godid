@@ -1,20 +1,18 @@
 ---
 kind: pipeline
 type: docker
-name: default
+name: CI/CD
 
 steps:
   - name: test
     image: golang
+    environment:
+      CODECOV_TOKEN:
+        from_secret: codecov_slug
     commands:
       - go get github.com/matryer/moq
       - make cover
-
-  - name: codecov
-    image: plugins/codecov
-    settings:
-      token:
-        from_secret: codecov_slug
+      - bash -c 'bash <(curl -s https://codecov.io/bash)'
 
   - name: build
     image: golang

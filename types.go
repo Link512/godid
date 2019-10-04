@@ -14,6 +14,8 @@ type entry struct {
 //aggregationFunction is a function used to aggregate entries retrieved from the store
 type aggregationFunction func([]entry) (interface{}, error)
 
+//go:generate moq -out=mock_entry_store.go . entryStore
+
 //entryStore is the db manager for entries
 type entryStore interface {
 	io.Closer

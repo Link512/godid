@@ -10,11 +10,8 @@ INSTALLED = $(GOBIN)/did
 
 all: $(INSTALLED)
 
-mocks:\
-	mock_entry_store.go
-
-mock_entry_store.go: types.go
-	moq -out=mock_entry_store.go . entryStore
+mocks:
+	go generate
 
 test: mocks
 	GODID_TEST=1 go test . -race -p=1

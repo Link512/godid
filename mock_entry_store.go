@@ -8,41 +8,34 @@ import (
 	"time"
 )
 
-var (
-	lockentryStoreMockClose                   sync.RWMutex
-	lockentryStoreMockGetRange                sync.RWMutex
-	lockentryStoreMockGetRangeWithAggregation sync.RWMutex
-	lockentryStoreMockPut                     sync.RWMutex
-)
-
 // Ensure, that entryStoreMock does implement entryStore.
 // If this is not the case, regenerate this file with moq.
 var _ entryStore = &entryStoreMock{}
 
 // entryStoreMock is a mock implementation of entryStore.
 //
-//     func TestSomethingThatUsesentryStore(t *testing.T) {
+// 	func TestSomethingThatUsesentryStore(t *testing.T) {
 //
-//         // make and configure a mocked entryStore
-//         mockedentryStore := &entryStoreMock{
-//             CloseFunc: func() error {
-// 	               panic("mock out the Close method")
-//             },
-//             GetRangeFunc: func(parentBucketName string, start time.Time, end time.Time) ([]entry, error) {
-// 	               panic("mock out the GetRange method")
-//             },
-//             GetRangeWithAggregationFunc: func(parentBucketName string, start time.Time, end time.Time, agg aggregationFunction) (interface{}, error) {
-// 	               panic("mock out the GetRangeWithAggregation method")
-//             },
-//             PutFunc: func(in1 string, in2 entry) error {
-// 	               panic("mock out the Put method")
-//             },
-//         }
+// 		// make and configure a mocked entryStore
+// 		mockedentryStore := &entryStoreMock{
+// 			CloseFunc: func() error {
+// 				panic("mock out the Close method")
+// 			},
+// 			GetRangeFunc: func(parentBucketName string, start time.Time, end time.Time) ([]entry, error) {
+// 				panic("mock out the GetRange method")
+// 			},
+// 			GetRangeWithAggregationFunc: func(parentBucketName string, start time.Time, end time.Time, agg aggregationFunction) (interface{}, error) {
+// 				panic("mock out the GetRangeWithAggregation method")
+// 			},
+// 			PutFunc: func(s string, entryMoqParam entry) error {
+// 				panic("mock out the Put method")
+// 			},
+// 		}
 //
-//         // use mockedentryStore in code that requires entryStore
-//         // and then make assertions.
+// 		// use mockedentryStore in code that requires entryStore
+// 		// and then make assertions.
 //
-//     }
+// 	}
 type entryStoreMock struct {
 	// CloseFunc mocks the Close method.
 	CloseFunc func() error
@@ -54,7 +47,7 @@ type entryStoreMock struct {
 	GetRangeWithAggregationFunc func(parentBucketName string, start time.Time, end time.Time, agg aggregationFunction) (interface{}, error)
 
 	// PutFunc mocks the Put method.
-	PutFunc func(in1 string, in2 entry) error
+	PutFunc func(s string, entryMoqParam entry) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -83,12 +76,16 @@ type entryStoreMock struct {
 		}
 		// Put holds details about calls to the Put method.
 		Put []struct {
-			// In1 is the in1 argument value.
-			In1 string
-			// In2 is the in2 argument value.
-			In2 entry
+			// S is the s argument value.
+			S string
+			// EntryMoqParam is the entryMoqParam argument value.
+			EntryMoqParam entry
 		}
 	}
+	lockClose                   sync.RWMutex
+	lockGetRange                sync.RWMutex
+	lockGetRangeWithAggregation sync.RWMutex
+	lockPut                     sync.RWMutex
 }
 
 // Close calls CloseFunc.
@@ -98,9 +95,9 @@ func (mock *entryStoreMock) Close() error {
 	}
 	callInfo := struct {
 	}{}
-	lockentryStoreMockClose.Lock()
+	mock.lockClose.Lock()
 	mock.calls.Close = append(mock.calls.Close, callInfo)
-	lockentryStoreMockClose.Unlock()
+	mock.lockClose.Unlock()
 	return mock.CloseFunc()
 }
 
@@ -111,9 +108,9 @@ func (mock *entryStoreMock) CloseCalls() []struct {
 } {
 	var calls []struct {
 	}
-	lockentryStoreMockClose.RLock()
+	mock.lockClose.RLock()
 	calls = mock.calls.Close
-	lockentryStoreMockClose.RUnlock()
+	mock.lockClose.RUnlock()
 	return calls
 }
 
@@ -131,9 +128,9 @@ func (mock *entryStoreMock) GetRange(parentBucketName string, start time.Time, e
 		Start:            start,
 		End:              end,
 	}
-	lockentryStoreMockGetRange.Lock()
+	mock.lockGetRange.Lock()
 	mock.calls.GetRange = append(mock.calls.GetRange, callInfo)
-	lockentryStoreMockGetRange.Unlock()
+	mock.lockGetRange.Unlock()
 	return mock.GetRangeFunc(parentBucketName, start, end)
 }
 
@@ -150,9 +147,9 @@ func (mock *entryStoreMock) GetRangeCalls() []struct {
 		Start            time.Time
 		End              time.Time
 	}
-	lockentryStoreMockGetRange.RLock()
+	mock.lockGetRange.RLock()
 	calls = mock.calls.GetRange
-	lockentryStoreMockGetRange.RUnlock()
+	mock.lockGetRange.RUnlock()
 	return calls
 }
 
@@ -172,9 +169,9 @@ func (mock *entryStoreMock) GetRangeWithAggregation(parentBucketName string, sta
 		End:              end,
 		Agg:              agg,
 	}
-	lockentryStoreMockGetRangeWithAggregation.Lock()
+	mock.lockGetRangeWithAggregation.Lock()
 	mock.calls.GetRangeWithAggregation = append(mock.calls.GetRangeWithAggregation, callInfo)
-	lockentryStoreMockGetRangeWithAggregation.Unlock()
+	mock.lockGetRangeWithAggregation.Unlock()
 	return mock.GetRangeWithAggregationFunc(parentBucketName, start, end, agg)
 }
 
@@ -193,43 +190,43 @@ func (mock *entryStoreMock) GetRangeWithAggregationCalls() []struct {
 		End              time.Time
 		Agg              aggregationFunction
 	}
-	lockentryStoreMockGetRangeWithAggregation.RLock()
+	mock.lockGetRangeWithAggregation.RLock()
 	calls = mock.calls.GetRangeWithAggregation
-	lockentryStoreMockGetRangeWithAggregation.RUnlock()
+	mock.lockGetRangeWithAggregation.RUnlock()
 	return calls
 }
 
 // Put calls PutFunc.
-func (mock *entryStoreMock) Put(in1 string, in2 entry) error {
+func (mock *entryStoreMock) Put(s string, entryMoqParam entry) error {
 	if mock.PutFunc == nil {
 		panic("entryStoreMock.PutFunc: method is nil but entryStore.Put was just called")
 	}
 	callInfo := struct {
-		In1 string
-		In2 entry
+		S             string
+		EntryMoqParam entry
 	}{
-		In1: in1,
-		In2: in2,
+		S:             s,
+		EntryMoqParam: entryMoqParam,
 	}
-	lockentryStoreMockPut.Lock()
+	mock.lockPut.Lock()
 	mock.calls.Put = append(mock.calls.Put, callInfo)
-	lockentryStoreMockPut.Unlock()
-	return mock.PutFunc(in1, in2)
+	mock.lockPut.Unlock()
+	return mock.PutFunc(s, entryMoqParam)
 }
 
 // PutCalls gets all the calls that were made to Put.
 // Check the length with:
 //     len(mockedentryStore.PutCalls())
 func (mock *entryStoreMock) PutCalls() []struct {
-	In1 string
-	In2 entry
+	S             string
+	EntryMoqParam entry
 } {
 	var calls []struct {
-		In1 string
-		In2 entry
+		S             string
+		EntryMoqParam entry
 	}
-	lockentryStoreMockPut.RLock()
+	mock.lockPut.RLock()
 	calls = mock.calls.Put
-	lockentryStoreMockPut.RUnlock()
+	mock.lockPut.RUnlock()
 	return calls
 }

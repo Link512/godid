@@ -14,10 +14,10 @@ mocks:
 	go generate
 
 test: mocks
-	GODID_TEST=1 go test . -race -p=1
+	GODID_TEST=1 go test .
 
 cover: mocks
-	GODID_TEST=1 go test -race -coverprofile=coverage.txt -covermode=atomic -p=1 .
+	GODID_TEST=1 go test -coverprofile=coverage.txt -covermode=atomic .
 	@sed -i.bak -e '/.*mock_entry_store\.go.*/d' ./coverage.txt
 	@sed -i.bak -e '/.*config\.go.*/d' ./coverage.txt
 	@rm coverage.txt.bak

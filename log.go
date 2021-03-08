@@ -1,7 +1,7 @@
 package godid
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/mitchellh/go-homedir"
@@ -22,7 +22,7 @@ func getLogger() *logrus.Logger {
 		return logger
 	}
 	logger = logrus.New()
-	logger.SetOutput(ioutil.Discard)
+	logger.SetOutput(io.Discard)
 	logger.Formatter = &logrus.TextFormatter{}
 	if os.Getenv("GODID_TEST") != "" {
 		return logger

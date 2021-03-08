@@ -1,7 +1,6 @@
 package godid
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 
@@ -37,7 +36,7 @@ func getConfig() (*config, error) {
 	if os.IsNotExist(err) {
 		return initDefaultConfig()
 	}
-	cfgBytes, err := ioutil.ReadFile(path)
+	cfgBytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +65,7 @@ func initDefaultConfig() (*config, error) {
 		if err != nil {
 			return nil, err
 		}
-		if err := ioutil.WriteFile(cfgPath, cfgBytes, 0600); err != nil {
+		if err := os.WriteFile(cfgPath, cfgBytes, 0600); err != nil {
 			return nil, err
 		}
 	}

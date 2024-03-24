@@ -66,7 +66,7 @@ func TestGetRange(t *testing.T) {
 		start            time.Time
 		end              time.Time
 		flat             bool
-		storeReturn      interface{}
+		storeReturn      any
 		storeShouldError bool
 		shouldError      bool
 		expected         map[string][]string
@@ -119,7 +119,7 @@ func TestGetRange(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			store = &entryStoreMock{
-				GetRangeWithAggregationFunc: func(bucketName string, _, _ time.Time, f aggregationFunction) (interface{}, error) {
+				GetRangeWithAggregationFunc: func(bucketName string, _, _ time.Time, f aggregationFunction) (any, error) {
 					require.Equal(t, testBucketName, bucketName)
 					if tc.storeShouldError {
 						return nil, errors.New("boom")

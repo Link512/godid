@@ -1,5 +1,6 @@
 run:
   concurrency: 4
   tests: false
-  skip-files:
+issues:
+  exclude-files:
     - test_utils.go

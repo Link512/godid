@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/samber/lo"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,34 +21,26 @@ var (
 
 var (
 	store           entryStore
-	flatAggregation = func(entries []entry) (interface{}, error) {
-		result := make([]string, len(entries))
-		for i, entry := range entries {
-			result[i] = string(entry.Content)
-		}
-		return result, nil
+	flatAggregation = func(entries []entry) (any, error) {
+		return lo.Map(entries, func(e entry, _ int) string {
+			return string(e.Content)
+		}), nil
 	}
-	perDayAggregation = func(entries []entry) (interface{}, error) {
+	perDayAggregation = func(entries []entry) (any, error) {
 		result := make(map[string][]string)
 		for _, entry := range entries {
 			content := string(entry.Content)
-			var toAdd []string
 			bucket, err := getBucketFromEntry(entry)
 			if err != nil {
 				return nil, err
 			}
-			if e, found := result[bucket]; found {
-				toAdd = append(e, content)
-			} else {
-				toAdd = []string{content}
-			}
-			result[bucket] = toAdd
+			result[bucket] = append(result[bucket], content)
 		}
 		return result, nil
 	}
 )
 
-//Init initialises godid
+// Init initialises godid
 func Init() {
 	cfg, err := getConfig()
 	if err != nil {
@@ -67,12 +60,12 @@ func Close() {
 	store.Close()
 }
 
-//AddEntry adds an entry to the underlying store in the root bucket
+// AddEntry adds an entry to the underlying store in the root bucket
 func AddEntry(what string) error {
 	return AddEntryToBucket(rootBucketName, what)
 }
 
-//AddEntryToBucket adds an entry to the underlying store in the specified parent bucket
+// AddEntryToBucket adds an entry to the underlying store in the specified parent bucket
 func AddEntryToBucket(bucket string, what string) error {
 	e := entry{
 		Content:   []byte(what),
@@ -83,18 +76,18 @@ func AddEntryToBucket(bucket string, what string) error {
 		getLogger().WithFields(logrus.Fields{
 			"component": "manager",
 			"method":    "AddEntry",
-			"entry":     "what",
+			"entry":     what,
 		}).WithError(err).Error("failed to put entry")
 	}
 	return err
 }
 
-//GetToday retrieves all entries logged today from the root bucket
+// GetToday retrieves all entries logged today from the root bucket
 func GetToday() ([]string, error) {
 	return GetTodayFromBucket(rootBucketName)
 }
 
-//GetTodayFromBucket retrieves all entries logged today from the specified bucket
+// GetTodayFromBucket retrieves all entries logged today from the specified bucket
 func GetTodayFromBucket(bucketName string) ([]string, error) {
 	start := time.Now()
 	result, err := getRange(bucketName, start, start, true)
@@ -109,12 +102,12 @@ func GetTodayFromBucket(bucketName string) ([]string, error) {
 	return result[flatEntriesPlaceholder], nil
 }
 
-//GetYesterday retrieves all entries logged yesterday from the root bucket
+// GetYesterday retrieves all entries logged yesterday from the root bucket
 func GetYesterday() ([]string, error) {
 	return GetYesterdayFromBucket(rootBucketName)
 }
 
-//GetYesterdayFromBucket retrieves all entries logged yesterday from the specified bucket
+// GetYesterdayFromBucket retrieves all entries logged yesterday from the specified bucket
 func GetYesterdayFromBucket(bucketName string) ([]string, error) {
 	start := time.Now().AddDate(0, 0, -1)
 	result, err := getRange(bucketName, start, start, true)
@@ -129,12 +122,12 @@ func GetYesterdayFromBucket(bucketName string) ([]string, error) {
 	return result[flatEntriesPlaceholder], nil
 }
 
-//GetThisWeek returns all entries from the current week from the root bucket
+// GetThisWeek returns all entries from the current week from the root bucket
 func GetThisWeek(flat bool) (map[string][]string, error) {
 	return GetThisWeekFromBucket(rootBucketName, flat)
 }
 
-//GetThisWeekFromBucket returns all entries from the current week from the specified bucket
+// GetThisWeekFromBucket returns all entries from the current week from the specified bucket
 func GetThisWeekFromBucket(bucketName string, flat bool) (map[string][]string, error) {
 	start, end := getWeekInterval(time.Now())
 	result, err := getRange(bucketName, start, end, flat)
@@ -150,12 +143,12 @@ func GetThisWeekFromBucket(bucketName string, flat bool) (map[string][]string, e
 	return result, err
 }
 
-//GetLastWeek returns all entries from the previous week from the root bucket
+// GetLastWeek returns all entries from the previous week from the root bucket
 func GetLastWeek(flat bool) (map[string][]string, error) {
 	return GetLastWeekFromBucket(rootBucketName, flat)
 }
 
-//GetLastWeekFromBucket returns all entries from the previous week from the specified bucket
+// GetLastWeekFromBucket returns all entries from the previous week from the specified bucket
 func GetLastWeekFromBucket(bucketName string, flat bool) (map[string][]string, error) {
 	aWeekBefore := time.Now().AddDate(0, 0, -7)
 	start, end := getWeekInterval(aWeekBefore)
@@ -172,12 +165,12 @@ func GetLastWeekFromBucket(bucketName string, flat bool) (map[string][]string, e
 	return result, err
 }
 
-//GetLastDuration retrives all the entries from the custom previous duration from the root bucket
+// GetLastDuration retrives all the entries from the custom previous duration from the root bucket
 func GetLastDuration(durationString string, flat bool) (map[string][]string, error) {
 	return GetLastDurationFromBucket(rootBucketName, durationString, flat)
 }
 
-//GetLastDurationFromBucket retrives all the entries from the custom previous duration from the specified bucket
+// GetLastDurationFromBucket retrives all the entries from the custom previous duration from the specified bucket
 func GetLastDurationFromBucket(bucketName string, durationString string, flat bool) (map[string][]string, error) {
 
 	d, err := parseDuration(durationString)

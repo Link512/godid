@@ -15,7 +15,7 @@ const (
 	timeFormat = time.RFC3339
 )
 
-//newBoltStore creates new entryStore with boltdb as a backend
+// newBoltStore creates new entryStore with boltdb as a backend
 func newBoltStore(cfg config) (*boltStore, error) {
 	path, err := cfg.GetStorePath()
 	if err != nil {
@@ -83,7 +83,7 @@ func (s *boltStore) GetRange(parentBucketName string, start, end time.Time) ([]e
 	return result, nil
 }
 
-func (s *boltStore) GetRangeWithAggregation(parentBucketName string, start, end time.Time, agg aggregationFunction) (interface{}, error) {
+func (s *boltStore) GetRangeWithAggregation(parentBucketName string, start, end time.Time, agg aggregationFunction) (any, error) {
 	if agg == nil {
 		return nil, errors.New("aggregation function is nil")
 	}

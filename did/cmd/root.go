@@ -15,7 +15,6 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "did",
 	Short: "A simple task tracker",
-	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		entry, err := cmd.Flags().GetString("entry")
 		if err != nil {
@@ -44,7 +43,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-//Execute is the entry point for the CLI
+// Execute is the entry point for the CLI
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

@@ -210,7 +210,7 @@ func (s *boltTestSuite) TestGetRangeWithAggregation() {
 		end         time.Time
 		agg         aggregationFunction
 		shouldError bool
-		expected    interface{}
+		expected    any
 	}{
 		{
 			shouldError: true,
@@ -219,7 +219,7 @@ func (s *boltTestSuite) TestGetRangeWithAggregation() {
 			start:       time.Now().Add(1 * time.Hour),
 			end:         time.Now(),
 			shouldError: true,
-			agg: func(e []entry) (interface{}, error) {
+			agg: func(e []entry) (any, error) {
 				return nil, nil
 			},
 		},
@@ -236,7 +236,7 @@ func (s *boltTestSuite) TestGetRangeWithAggregation() {
 		{
 			start: timeFromString(s.T(), "2018-06-20T10:11:00Z"),
 			end:   timeFromString(s.T(), "2018-06-21T10:11:00Z"),
-			agg: func(e []entry) (interface{}, error) {
+			agg: func(e []entry) (any, error) {
 				return nil, errors.New("BOOM")
 			},
 			shouldError: true,
@@ -244,7 +244,7 @@ func (s *boltTestSuite) TestGetRangeWithAggregation() {
 		{
 			start: timeFromString(s.T(), "2018-06-18T12:11:00Z"),
 			end:   timeFromString(s.T(), "2018-09-19T09:11:00Z"),
-			agg: func(e []entry) (interface{}, error) {
+			agg: func(e []entry) (any, error) {
 				return e, nil
 			},
 			expected: []entry{
